@@ -20,7 +20,7 @@ class Command(BaseCommand):
             email=email,
             password=password,
             full_name=full_name,
-            phone_number="",
-            address="",
+            phone_number="09123456789",
+            address="Admin Address",
         )
         self.stdout.write(self.style.SUCCESS(f"Admin user created: {user.email}"))
