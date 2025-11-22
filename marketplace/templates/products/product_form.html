@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Color Scheme */
+    :root {
+        --primary: #198754;         /* Kaumahan Green */
+        --primary-light: #e8f5e9;   /* Light green for backgrounds */
+        --primary-dark: #0d6e3f;    /* Darker green for hover states */
+        --secondary: #6c757d;       /* Gray for secondary text */
+        --light: #f8f9fa;          /* Light gray for backgrounds */
+        --dark: #212529;           /* Dark for text */
+        --border-radius: 8px;      /* Consistent border radius */
+    }
+
+    /* Form Container */
+    .form-card {
+        background: #fff;
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-top: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        padding: 2.5rem;
+        margin: 2rem 0;
+        border: 1px solid #e9ecef;
+    }
+
+    /* Form Elements */
+    .form-label {
+        font-weight: 500;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+        font-size: 14px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #dee2e6;
+        border-radius: var(--border-radius);
+        padding: 0.75rem 1rem;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        height: calc(2.8rem + 2px);
+        width: 100%;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-success {
+        background-color: var(--primary);
+        border: none;
+        min-width: 150px;
+    }
+
+    .btn-success:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid #dee2e6;
+        color: #6c757d;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Image Upload */
+    .image-upload-container {
+        border: 2px dashed #dee2e6;
+        border-radius: var(--border-radius);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-upload-container:hover {
+        border-color: var(--primary);
+        background-color: #f1f8f4;
+    }
+
+    .image-preview {
+        max-width: 100%;
+        max-height: 200px;
+        border-radius: var(--border-radius);
+        display: none;
+        margin: 0 auto;
+        border: 1px solid #e9ecef;
+        object-fit: contain;
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    /* Adjust column gutters for better spacing */
+    @media (min-width: 992px) {
+        .pe-lg-4 {
+            padding-right: 1.5rem !important;
+        }
+        .ps-lg-4 {
+            padding-left: 1.5rem !important;
+        }
+    }
+
+    /* Style form switches */
+    .form-switch .form-check-input {
+        width: 2.5em;
+        margin-left: -2.8em;
+        height: 1.4em;
+        margin-top: 0.2em;
+    }
+
+    .form-switch .form-check-label {
+        margin-left: 0.5rem;
+        font-size: 14px;
+    }
+    
+    .form-text, .form-switch .form-text {
+        font-size: 13px;
+    }
+    
+    .text-muted, .form-text {
+        font-size: 13px;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .form-card {
+            padding: 1.25rem;
+            margin: 1rem 0;
+        }
+
+        .btn {
+            width: 100%;
+            margin-bottom: 0.75rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="py-4" style="background: linear-gradient(135deg, #f8fff8 0%, #e8f5e9 100%); min-height: 100vh;">
+    <div class="container py-5">
+        <div class="card border-0 shadow" style="background-color: #198754;">
+            <div class="card-body p-4 p-md-5 text-white">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold mb-2">
+                        {% if form.instance.pk %}Edit Product{% else %}Add New Product{% endif %}
+                    </h2>
+                    <p class="mb-0">
+                        {% if form.instance.pk %}Update your product details{% else %}Fill in the details to add a new product{% endif %}
+                    </p>
+                </div>
+
+                <!-- Main Form -->
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <div class="form-card">
+                        <div class="row g-4">
+                            <!-- Left Column - Form Fields -->
+                            <div class="col-md-7 pe-lg-4">
+                                <!-- Product Name -->
+                                <div class="form-group mb-4">
+                                    <label for="id_name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                                    {{ form.name }}
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback d-block small">
+                                            <i class="bi bi-exclamation-circle me-1"></i>{{ form.name.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Description -->
+                                <div class="form-group mb-4">
+                                    <label for="id_description" class="form-label">Description <span class="text-danger">*</span></label>
+                                    {{ form.description }}
+                                    {% if form.description.errors %}
+                                        <div class="invalid-feedback d-block small">
+                                            <i class="bi bi-exclamation-circle me-1"></i>{{ form.description.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row g-4">
+                                    <!-- Category -->
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="id_category" class="form-label">Category <span class="text-danger">*</span></label>
+                                            {{ form.category }}
+                                            {% if form.category.errors %}
+                                                <div class="invalid-feedback d-block small">
+                                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.category.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    <!-- Price and Unit -->
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label for="id_price" class="form-label">Price (₱) <span class="text-danger">*</span></label>
+                                            <div class="d-flex gap-2">
+                                                <div class="input-group" style="max-width: 200px;">
+                                                    <span class="input-group-text bg-light">₱</span>
+                                                    {{ form.price }}
+                                                </div>
+                                                <div style="min-width: 200px;">
+                                                    {{ form.unit }}
+                                                </div>
+                                            </div>
+                                            {% if form.price.errors %}
+                                                <div class="invalid-feedback d-block small">
+                                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.price.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                            {% if form.unit.errors %}
+                                                <div class="invalid-feedback d-block small">
+                                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.unit.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column - Image and Status -->
+                            <div class="col-md-5 ps-lg-4">
+                                <!-- Product Image -->
+                                <div class="form-group mb-4">
+                                    <label class="form-label">Product Image <span class="text-danger">*</span></label>
+                                    <div class="image-upload-container" id="image-upload-container">
+                                        <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                                        <p class="mb-1 mt-2 fw-medium">Click to upload</p>
+                                        <p class="small text-muted">or drag & drop</p>
+                                        <p class="small text-muted mt-1">PNG, JPG, or WebP (max. 5MB)</p>
+                                        {{ form.image }}
+                                    </div>
+
+                                    <div class="text-center mt-3">
+                                        <img id="imagePreview"
+                                             src="{% if form.instance.image %}{{ form.instance.image.url }}{% else %}{% static 'img/placeholder-product.png' %}{% endif %}"
+                                             alt="Product preview"
+                                             class="img-fluid image-preview {% if form.instance.image %}d-block{% endif %}"
+                                             style="max-height: 200px; width: auto; object-fit: contain;">
+                                    </div>
+
+                                    {% if form.image.errors %}
+                                        <div class="invalid-feedback d-block small mt-2">
+                                            <i class="bi bi-exclamation-circle me-1"></i>{{ form.image.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Status Toggles -->
+                                <div class="p-4 rounded-3" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                                    <div class="form-check form-switch mb-3">
+                                        {{ form.is_active }}
+                                        <label class="form-check-label fw-medium" for="id_is_active" style="color: #000;">Active Product</label>
+                                        <div class="form-text small text-muted">Product will be visible to customers</div>
+                                    </div>
+
+                                    <div class="form-check form-switch">
+                                        {{ form.is_featured }}
+                                        <label class="form-check-label fw-medium" for="id_is_featured" style="color: #000;">Featured on Homepage</label>
+                                        <div class="form-text small text-muted">Show this product in featured section</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                            <a href="{% url 'seller_dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left me-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check2-circle me-2"></i> {% if form.instance.pk %}Update{% else %}Publish{% endif %} Product
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('id_image');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageUploadContainer = document.getElementById('image-upload-container');
+
+        // Show preview when file is selected
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Handle drag and drop
+        if (imageUploadContainer) {
+            // Highlight drop zone when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                imageUploadContainer.addEventListener(eventName, highlight, false);
+            });
+
+            // Unhighlight drop zone when item leaves it
+            ['dragleave', 'drop'].forEach(eventName => {
+                imageUploadContainer.addEventListener(eventName, unhighlight, false);
+            });
+
+            // Handle dropped files
+            imageUploadContainer.addEventListener('drop', handleDrop, false);
+
+            // Click to open file dialog
+            imageUploadContainer.addEventListener('click', function() {
+                imageInput.click();
+            });
+        }
+
+        function highlight(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            imageUploadContainer.style.borderColor = '#198754';
+            imageUploadContainer.style.backgroundColor = '#f1f8f4';
+        }
+
+        function unhighlight(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            imageUploadContainer.style.borderColor = '#dee2e6';
+            imageUploadContainer.style.backgroundColor = '#f8f9fa';
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                imageInput.files = files;
+                const event = new Event('change');
+                imageInput.dispatchEvent(event);
+            }
+        }
+    });
+</script>
+{% endblock %}

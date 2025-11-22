@@ -1,0 +1,30 @@
+{% load static %}
+
+<form class="star-rating-form" action="{% url 'rate_product' %}" method="post" data-product-id="{{ product.id }}">
+    {% csrf_token %}
+    <input type="hidden" name="product_id" value="{{ product.id }}">
+    
+    <div class="star-rating">
+        <input type="radio" id="star5-{{ product.id }}" name="rating-{{ product.id }}" value="5" {% if user_rating == 5 %}checked{% endif %}>
+        <label for="star5-{{ product.id }}" title="5 stars">★</label>
+        
+        <input type="radio" id="star4-{{ product.id }}" name="rating-{{ product.id }}" value="4" {% if user_rating == 4 %}checked{% endif %}>
+        <label for="star4-{{ product.id }}" title="4 stars">★</label>
+        
+        <input type="radio" id="star3-{{ product.id }}" name="rating-{{ product.id }}" value="3" {% if user_rating == 3 %}checked{% endif %}>
+        <label for="star3-{{ product.id }}" title="3 stars">★</label>
+        
+        <input type="radio" id="star2-{{ product.id }}" name="rating-{{ product.id }}" value="2" {% if user_rating == 2 %}checked{% endif %}>
+        <label for="star2-{{ product.id }}" title="2 stars">★</label>
+        
+        <input type="radio" id="star1-{{ product.id }}" name="rating-{{ product.id }}" value="1" {% if user_rating == 1 %}checked{% endif %}>
+        <label for="star1-{{ product.id }}" title="1 star">★</label>
+    </div>
+    
+    <input type="hidden" name="rating" value="{{ user_rating|default:'' }}">
+</form>
+
+{% if not is_included %}
+    <link rel="stylesheet" href="{% static 'css/star-rating.css' %}">
+    <script src="{% static 'js/star-rating.js' %}"></script>
+{% endif %}

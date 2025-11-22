@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Kaumahan Harvest Market{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-success h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-1">Buyers</h6>
+                <div class="fs-3 fw-bold">{{ buyers|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-primary h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-1">Sellers</h6>
+                <div class="fs-3 fw-bold">{{ sellers|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-warning h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-1">Pending sellers</h6>
+                <div class="fs-3 fw-bold">{{ pending_sellers|length }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-dark h-100">
+            <div class="card-body">
+                <h6 class="text-uppercase small mb-1">Orders</h6>
+                <div class="fs-3 fw-bold">{{ orders|length }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Pending seller approvals</h5>
+                {% if pending_sellers %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Business</th>
+                                    <th>Registered</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for seller in pending_sellers %}
+                                    <tr>
+                                        <td>{{ seller.full_name }}</td>
+                                        <td>{{ seller.business_name }}</td>
+                                        <td>{{ seller.date_joined|date:'Y-m-d' }}</td>
+                                        <td class="text-end">
+                                            <form method="post" action="{% url 'approve_seller' seller.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                            </form>
+                                            <form method="post" action="{% url 'reject_seller' seller.id %}" class="d-inline ms-1">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-outline-danger btn-sm">Reject</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No pending sellers at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Recent orders</h5>
+                {% if orders %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Buyer</th>
+                                    <th>Seller</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders|slice:':10' %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>{{ order.buyer.full_name }}</td>
+                                        <td>{{ order.seller.business_name|default:order.seller.full_name }}</td>
+                                        <td>{{ order.get_status_display }}</td>
+                                        <td>₱{{ order.total_amount }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No orders yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">All products</h5>
+                {% if products %}
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Seller</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products|slice:':10' %}
+                                    <tr>
+                                        <td>{{ product.name }}</td>
+                                        <td>{{ product.seller.business_name|default:product.seller.full_name }}</td>
+                                        <td>{{ product.category }}</td>
+                                        <td>₱{{ product.price }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No products available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Registered users</h5>
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in buyers %}
+                                <tr>
+                                    <td>{{ user.full_name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>Buyer</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                </tr>
+                            {% endfor %}
+                            {% for user in sellers %}
+                                <tr>
+                                    <td>{{ user.full_name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>Seller</td>
+                                    <td>
+                                        {% if user.is_approved %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

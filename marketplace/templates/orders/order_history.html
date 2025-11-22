@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Kaumahan Harvest Market{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">My orders</h2>
+{% if orders %}
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Seller</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <td>#{{ order.id }}</td>
+                        <td>{{ order.seller.business_name|default:order.seller.full_name }}</td>
+                        <td>{{ order.get_status_display }}</td>
+                        <td>₱{{ order.total_amount }}</td>
+                        <td>{{ order.created_at|date:'Y-m-d H:i' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p class="text-muted">You have not placed any orders yet.</p>
+{% endif %}
+{% endblock %}

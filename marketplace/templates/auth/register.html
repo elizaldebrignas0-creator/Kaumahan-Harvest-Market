@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register - Kaumahan Harvest Market{% endblock %}
+
+{% block content %}
+<div class="py-5" style="background: linear-gradient(135deg, #f8fff8 0%, #e8f5e9 100%); min-height: 100vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card border-0 shadow" style="background-color: #198754;">
+                <div class="card-body p-4 p-md-5 text-white">
+                    <div class="text-center mb-4">
+                        <h2 class="h3 mb-3 text-white">Create your account</h2>
+                        <p class="text-muted fw-bold" style="font-size: 20px;">Join Kaumahan Harvest Market as a buyer or seller.</p>
+                    </div>
+
+        <form method="post" enctype="multipart/form-data" id="registration-form" novalidate>
+            {% csrf_token %}
+            <div class="row g-4">
+                <!-- Left Column -->
+                <div class="col-md-6">
+                    <div class="card h-100 border-0">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-4">Personal Information</h5>
+                            <div class="auth-field mb-3">
+                                <label class="form-label fw-bold" for="id_full_name">Full name</label>
+                                <input type="text" name="full_name" class="form-control" id="id_full_name" value="{{ form.full_name.value|default:'' }}" required style="border-color: #198754;">
+                                {% for error in form.full_name.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="auth-field mb-3">
+                                <label class="form-label fw-bold" for="id_email">Email</label>
+                                <input type="email" name="email" class="form-control" id="id_email" value="{{ form.email.value|default:'' }}" required style="border-color: #198754;">
+                                {% for error in form.email.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="auth-field mb-3">
+                                <label class="form-label fw-bold" for="id_phone_number">Phone number</label>
+                                <input type="text" name="phone_number" class="form-control" id="id_phone_number" value="{{ form.phone_number.value|default:'' }}" required style="border-color: #198754;">
+                                {% for error in form.phone_number.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="auth-field mb-3">
+                                <label class="form-label fw-bold" for="id_address">Address</label>
+                                <input type="text" name="address" class="form-control" id="id_address" value="{{ form.address.value|default:'' }}" required style="border-color: #198754;">
+                                {% for error in form.address.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="auth-field mb-3">
+                                <label class="form-label fw-bold" for="id_password">Password</label>
+                                <input type="password" name="password" class="form-control" id="id_password" required style="border-color: #198754;">
+                                {% for error in form.password.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="auth-field mb-3">
+                                <label class="form-label fw-bold" for="id_confirm_password">Confirm password</label>
+                                <input type="password" name="confirm_password" class="form-control" id="id_confirm_password" required style="border-color: #198754;">
+                                {% for error in form.confirm_password.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <div class="card h-100 border-0">
+                        <div class="card-body p-4">
+                            <h5 class="card-title mb-4">Account Details</h5>
+                            <div class="auth-field mb-3">
+                                <label class="form-label fw-bold" for="id_user_type">Account type</label>
+                                <div style="border: 1px solid #198754; border-radius: 0.25rem; padding: 0.375rem 0.75rem;">
+                                    {{ form.user_type }}
+                                </div>
+                                {% for error in form.user_type.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="seller-only auth-field mb-3" style="display:none;">
+                                <label class="form-label fw-bold" for="id_business_name">Business name</label>
+                                <input type="text" name="business_name" class="form-control" id="id_business_name" value="{{ form.business_name.value|default:'' }}" style="border-color: #198754;">
+                                {% for error in form.business_name.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="seller-only auth-field mb-3" style="display:none;">
+                                <label class="form-label fw-bold" for="id_business_permit">Business permit (image/PDF)</label>
+                                <input type="file" name="business_permit" class="form-control" id="id_business_permit" style="border-color: #198754;">
+                                {% for error in form.business_permit.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            {{ form.latitude }}
+                            {{ form.longitude }}
+                            
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger mt-2">
+                                    {% for error in form.non_field_errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="seller-only auth-field mb-4" id="seller-map-wrapper" style="display:none;">
+                                <label class="form-label fw-bold">Pin your business location</label>
+                                <div id="seller-map" class="map-container border rounded" style="height: 200px;"></div>
+                                <div class="form-text text-muted mt-1">Click on the map to set your exact location in Biliran.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success w-100">Create account</button>
+                </div>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const userTypeSelect = document.getElementById('id_user_type');
+        const sellerOnlyFields = document.querySelectorAll('.seller-only');
+        const latInput = document.getElementById('id_latitude');
+        const lngInput = document.getElementById('id_longitude');
+        let map, marker;
+
+        function toggleSellerFields() {
+            const isSeller = userTypeSelect && userTypeSelect.value === 'seller';
+            sellerOnlyFields.forEach(function (el) {
+                el.style.display = isSeller ? '' : 'none';
+            });
+            if (isSeller && !map && typeof L !== 'undefined') {
+                map = L.map('seller-map').setView([11.5833, 124.4667], 11);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                function setMarker(lat, lng) {
+                    if (marker) {
+                        marker.setLatLng([lat, lng]);
+                    } else {
+                        marker = L.marker([lat, lng]).addTo(map);
+                    }
+                    latInput.value = lat.toFixed(6);
+                    lngInput.value = lng.toFixed(6);
+                }
+
+                map.on('click', function (e) {
+                    setMarker(e.latlng.lat, e.latlng.lng);
+                });
+            }
+        }
+
+        if (userTypeSelect) {
+            userTypeSelect.addEventListener('change', toggleSellerFields);
+            toggleSellerFields();
+        }
+    });
+</script>
+{% endblock %}

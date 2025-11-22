@@ -1,0 +1,51 @@
+# =========================================================
+# Kaumahan Harvest Market - Python/Django Requirements
+# =========================================================
+
+# Core Django
+Django==4.2.10
+python-decouple==3.8               # Manage .env configuration
+
+# Database
+mysqlclient==2.2.0                 # MySQL driver for Django
+
+# Media handling
+Pillow==10.1.0                     # Image processing for product & business permit uploads
+
+# Forms and UI
+django-crispy-forms==2.1
+crispy-bootstrap5==2023.10         # Bootstrap 5 integration with crispy-forms
+
+# Maps & Location (Leaflet integration)
+geojson==2.5.0
+django-leaflet==0.32.0
+
+# Development
+django-debug-toolbar==4.2.0
+ipython==8.15.0
+python-dotenv==1.1.1
+
+# Production / Deployment
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Security & Performance
+django-extensions==4.1.0
+django-filter==23.2
+
+# Testing
+pytest==7.4.3
+pytest-django==4.7.0
+factory-boy==3.3.2
+
+# Code Quality & Formatting
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+
+# Optional Enhancements
+django-bootstrap-icons==0.9.0
+django-crontab==0.7.1          # 1.1.0 DOES NOT EXIST → fixed to latest available
+celery==5.3.6
+redis==5.0.1
+
