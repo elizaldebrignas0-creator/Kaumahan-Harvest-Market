@@ -9,7 +9,7 @@ SECRET_KEY = config("SECRET_KEY", default="django-insecure-kaumahan-dev-key")
 
 DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost,127.0.0.1,*.onrender.com").split(",")
 
 
 INSTALLED_APPS = [
@@ -63,13 +63,24 @@ WSGI_APPLICATION = "kaumahan.wsgi.application"
 
 
 import dj_database_url
+import os
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=config("DATABASE_URL", default=f"mysql://{config('DB_USER', default='root')}:{config('DB_PASSWORD', default='')}@{config('DB_HOST', default='127.0.0.1')}:{config('DB_PORT', default='3306')}/{config('DB_NAME', default='kaumahan_db')}"),
-        conn_max_age=600
-    )
-}
+# Database configuration
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": config("DB_NAME", default="kaumahan_db"),
+            "USER": config("DB_USER", default="root"),
+            "PASSWORD": config("DB_PASSWORD", default=""),
+            "HOST": config("DB_HOST", default="127.0.0.1"),
+            "PORT": config("DB_PORT", default="3306"),
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
