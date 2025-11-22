@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 🌾 Kaumahan Harvest Market – Farm-Themed Online Marketplace
 
 A full-featured online marketplace connecting local farmers with buyers, built with Django 4.2.7, Python 3.11, and MySQL.
@@ -227,3 +228,7 @@ Leaflet map for seller location pinning
 All user roles & dashboards
 
 COD payment only
+=======
+# Kaumahan-Harvest-Market
+Kaumahan Harvest Market is a Django web app connecting local farmers and buyers. Sellers can list fresh produce, while buyers can browse, add to cart, and place orders. Features include user authentication, ratings, reviews, and a responsive interface promoting local farm-to-table commerce.
+>>>>>>> febb0e4c7a32b6b8e50c55c90dc1806ae686c7c9
