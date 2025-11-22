@@ -66,21 +66,12 @@ import dj_database_url
 import os
 
 # Database configuration
-if 'DATABASE_URL' in os.environ:
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": config("DB_NAME", default="kaumahan_db"),
-            "USER": config("DB_USER", default="root"),
-            "PASSWORD": config("DB_PASSWORD", default=""),
-            "HOST": config("DB_HOST", default="127.0.0.1"),
-            "PORT": config("DB_PORT", default="3306"),
-        }
-    }
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"postgresql://user:pass@localhost:5432/kaumahan_db",
+        conn_max_age=600
+    )
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [
