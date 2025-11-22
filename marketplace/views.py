@@ -24,7 +24,7 @@ CustomUser = get_user_model()
 
 
 def redirect_authenticated_user(user):
-    if user.is_staff:
+    if user.is_staff or user.is_superuser:
         return "admin_dashboard"
     if getattr(user, "is_seller", False):
         return "seller_dashboard"
