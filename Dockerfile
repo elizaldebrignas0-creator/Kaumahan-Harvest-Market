@@ -12,9 +12,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+RUN chmod +x start.sh
 
 RUN python manage.py collectstatic --noinput --settings=kaumahan.settings
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "kaumahan.wsgi:application"]
+CMD ["./start.sh"]
