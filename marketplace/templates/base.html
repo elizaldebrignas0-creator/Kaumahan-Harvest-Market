@@ -154,12 +154,12 @@
             </ul>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 {% if user.is_authenticated %}
-                    {% if user.is_buyer %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'buyer_dashboard' %}">Buyer Dashboard</a></li>
+                    {% if user.is_staff or user.is_superuser %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Admin Panel</a></li>
                     {% elif user.is_seller %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'seller_dashboard' %}">Seller Dashboard</a></li>
-                    {% elif user.is_staff %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'admin_dashboard' %}">Admin Panel</a></li>
+                    {% elif user.is_buyer %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'buyer_dashboard' %}">Buyer Dashboard</a></li>
                     {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
