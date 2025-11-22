@@ -1,12 +1,14 @@
 from .settings import *
 import os
-import dj_database_url
 
 DEBUG = False
 ALLOWED_HOSTS = ['*']
-SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-key')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-fallback-key-12345')
 
-if os.environ.get('DATABASE_URL'):
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
+# Use SQLite for now
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/tmp/db.sqlite3',
     }
+}
