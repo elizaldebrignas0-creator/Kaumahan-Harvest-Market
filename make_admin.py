@@ -7,7 +7,7 @@ django.setup()
 
 from marketplace.models import CustomUser
 
-email = "elizaldepelaez0@gmail.com"
+email = "pelaezelizalde0@gmail.com"
 try:
     user = CustomUser.objects.get(email=email)
     user.is_staff = True
