@@ -62,15 +62,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "kaumahan.wsgi.application"
 
 
-import dj_database_url
-import os
-
 # Database configuration
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"postgresql://user:pass@localhost:5432/kaumahan_db",
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'kaumahan_db',
+        'USER': 'postgres',
+        'PASSWORD': 'your_postgres_password',  # Replace with your PostgreSQL password
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 
 
