@@ -127,7 +127,7 @@ class ProductForm(forms.ModelForm):
                 raise forms.ValidationError("Product image is required for new products")
         
         # Validate file size (max 5MB)
-        if image and image.size > 5 * 1024 * 1024:
+        if image and hasattr(image, 'size') and image.size > 5 * 1024 * 1024:
             raise forms.ValidationError("Image file size must be less than 5MB")
         
         # Validate file type
@@ -138,6 +138,15 @@ class ProductForm(forms.ModelForm):
                 raise forms.ValidationError(
                     f"Invalid file type. Allowed types: {', '.join(valid_extensions)}"
                 )
+            
+            # Additional validation using PIL
+            try:
+                from PIL import Image
+                img = Image.open(image)
+                img.verify()  # Verify it's a valid image
+                image.seek(0)  # Reset file pointer after verification
+            except Exception:
+                raise forms.ValidationError("Invalid image file. Please upload a valid image.")
         
         return image
 
