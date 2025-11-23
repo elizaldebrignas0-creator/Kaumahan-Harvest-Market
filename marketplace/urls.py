@@ -33,9 +33,7 @@ urlpatterns = [
     path("sellers/<int:user_id>/reject/", views.reject_seller, name="reject_seller"),
 ]
 
-# Serve media files in both development and production
+# Serve media files using custom view
 urlpatterns += [
-    re_path(r'^media/(?P<path>.*)$', serve, {
-        'document_root': settings.MEDIA_ROOT,
-    }),
+    re_path(r'^media/(?P<path>.*)$', views.custom_media_serve, name='custom_media_serve'),
 ]

@@ -435,3 +435,37 @@ def reject_seller(request, user_id):
     seller.save()
     messages.success(request, f"Seller {seller.full_name} rejected.")
     return redirect("admin_dashboard")
+
+
+def custom_media_serve(request, path):
+    """
+    Custom media serving view that works on Render and other production platforms
+    """
+    import os
+    from django.conf import settings
+    from django.http import HttpResponse, Http404
+    from mimetypes import guess_type
+    
+    # Security check - prevent directory traversal
+    if '..' in path or path.startswith('/'):
+        raise Http404("File not found")
+    
+    # Construct the full file path
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    
+    # Check if file exists
+    if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        raise Http404("File not found")
+    
+    # Guess MIME type
+    mime_type, encoding = guess_type(file_path)
+    mime_type = mime_type or 'application/octet-stream'
+    
+    # Serve the file
+    try:
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type=mime_type)
+            response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"'
+            return response
+    except Exception:
+        raise Http404("File not found")
