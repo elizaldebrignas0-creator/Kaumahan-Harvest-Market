@@ -454,8 +454,15 @@ def serve_media(request, path):
     # Construct the full file path
     file_path = os.path.join(settings.MEDIA_ROOT, path)
     
-    # Check if file exists
+    # Normalize path for cross-platform compatibility
+    file_path = os.path.normpath(file_path)
+    
+    # Check if file exists and is within media root
     if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        raise Http404("File not found")
+    
+    # Additional security check
+    if not os.path.abspath(file_path).startswith(os.path.abspath(settings.MEDIA_ROOT)):
         raise Http404("File not found")
     
     # Guess MIME type
@@ -466,7 +473,14 @@ def serve_media(request, path):
     try:
         with open(file_path, 'rb') as f:
             response = HttpResponse(f.read(), content_type=mime_type)
+            
+            # Set proper headers for caching and display
             response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"'
+            response['Cache-Control'] = 'public, max-age=3600'  # Cache for 1 hour
+            
+            # Add CORS headers if needed
+            response['Access-Control-Allow-Origin'] = '*'
+            
             return response
     except Exception:
         raise Http404("File not found")
