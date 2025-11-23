@@ -131,16 +131,25 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        {% for seller in sellers %}
-            {% if seller.latitude and seller.longitude %}
-                (function () {
-                    const lat = parseFloat('{{ seller.latitude }}');
-                    const lng = parseFloat('{{ seller.longitude }}');
-                    L.marker([lat, lng]).addTo(map)
-                        .bindPopup('<strong>{{ seller.business_name|default:seller.full_name|escapejs }}</strong><br>{{ seller.address|escapejs }}');
-                })();
-            {% endif %}
-        {% endfor %}
+        // Create sellers data array from Django context
+        const sellersData = [
+            {% for seller in sellers %}
+                {% if seller.latitude and seller.longitude %}
+                    {
+                        lat: {{ seller.latitude }},
+                        lng: {{ seller.longitude }},
+                        name: "{{ seller.business_name|default:seller.full_name|escapejs }}",
+                        address: "{{ seller.address|escapejs }}"
+                    },
+                {% endif %}
+            {% endfor %}
+        ];
+
+        // Add markers for each seller
+        sellersData.forEach(function(seller) {
+            L.marker([seller.lat, seller.lng]).addTo(map)
+                .bindPopup('<strong>' + seller.name + '</strong><br>' + seller.address);
+        });
     });
 </script>
 {% endblock %}
