@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate
 from django.contrib.auth import get_user_model
+import os
 
 from .models import CartItem, Order, Product, RatingReview
 
@@ -106,6 +107,39 @@ class ProductForm(forms.ModelForm):
         labels = {
             'unit': 'Unit of Measurement',
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Make image field optional for updates, but show as required for new products
+        if self.instance and self.instance.pk:
+            self.fields['image'].required = False
+            self.fields['image'].help_text = "Leave empty to keep current image"
+        else:
+            self.fields['image'].required = True
+            self.fields['image'].help_text = "Required: Upload a product image"
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        
+        # For new products, image is required
+        if not self.instance or not self.instance.pk:
+            if not image:
+                raise forms.ValidationError("Product image is required for new products")
+        
+        # Validate file size (max 5MB)
+        if image and image.size > 5 * 1024 * 1024:
+            raise forms.ValidationError("Image file size must be less than 5MB")
+        
+        # Validate file type
+        if image:
+            valid_extensions = ['.jpg', '.jpeg', '.png', '.webp']
+            file_extension = os.path.splitext(image.name)[1].lower()
+            if file_extension not in valid_extensions:
+                raise forms.ValidationError(
+                    f"Invalid file type. Allowed types: {', '.join(valid_extensions)}"
+                )
+        
+        return image
 
 
 class CartAddForm(forms.ModelForm):
