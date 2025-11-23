@@ -33,10 +33,9 @@ urlpatterns = [
     path("sellers/<int:user_id>/reject/", views.reject_seller, name="reject_seller"),
 ]
 
-# Serve media files in production
-if not settings.DEBUG:
-    urlpatterns += [
-        re_path(r'^media/(?P<path>.*)$', serve, {
-            'document_root': settings.MEDIA_ROOT,
-        }),
-    ]
+# Serve media files in both development and production
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
+]
