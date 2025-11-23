@@ -62,17 +62,22 @@ TEMPLATES = [
 WSGI_APPLICATION = "kaumahan.wsgi.application"
 
 
+import dj_database_url
+import os
+
 # Database configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'kaumahan_db',
-        'USER': 'postgres',
-        'PASSWORD': 'your_postgres_password',  # Replace with your PostgreSQL password
-        'HOST': 'localhost',
-        'PORT': '5432',
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
-}
+else:
+    # Local development with SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
