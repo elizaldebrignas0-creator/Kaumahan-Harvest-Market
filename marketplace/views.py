@@ -446,26 +446,36 @@ def custom_media_serve(request, path):
     from django.http import HttpResponse, Http404
     from mimetypes import guess_type
     
+    print(f"DEBUG: custom_media_serve called with path: {path}")
+    print(f"DEBUG: MEDIA_ROOT: {settings.MEDIA_ROOT}")
+    
     # Security check - prevent directory traversal
     if '..' in path or path.startswith('/'):
+        print(f"DEBUG: Security check failed for path: {path}")
         raise Http404("File not found")
     
     # Construct the full file path
     file_path = os.path.join(settings.MEDIA_ROOT, path)
+    print(f"DEBUG: Full file path: {file_path}")
     
     # Check if file exists
     if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        print(f"DEBUG: File not found at: {file_path}")
         raise Http404("File not found")
     
     # Guess MIME type
     mime_type, encoding = guess_type(file_path)
     mime_type = mime_type or 'application/octet-stream'
+    print(f"DEBUG: MIME type: {mime_type}")
     
     # Serve the file
     try:
         with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type=mime_type)
+            content = f.read()
+            response = HttpResponse(content, content_type=mime_type)
             response['Content-Disposition'] = f'inline; filename="{os.path.basename(file_path)}"'
+            print(f"DEBUG: Serving {len(content)} bytes")
             return response
-    except Exception:
+    except Exception as e:
+        print(f"DEBUG: Error serving file: {e}")
         raise Http404("File not found")
