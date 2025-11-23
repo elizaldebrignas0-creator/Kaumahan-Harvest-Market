@@ -131,25 +131,32 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        // Create sellers data array from Django context
-        const sellersData = [
-            {% for seller in sellers %}
-                {% if seller.latitude and seller.longitude %}
-                    {
-                        lat: {{ seller.latitude }},
-                        lng: {{ seller.longitude }},
-                        name: "{{ seller.business_name|default:seller.full_name|escapejs }}",
-                        address: "{{ seller.address|escapejs }}"
-                    },
-                {% endif %}
-            {% endfor %}
-        ];
-
-        // Add markers for each seller
-        sellersData.forEach(function(seller) {
-            L.marker([seller.lat, seller.lng]).addTo(map)
-                .bindPopup('<strong>' + seller.name + '</strong><br>' + seller.address);
+        // Get all seller markers from data attributes
+        const sellerMarkers = document.querySelectorAll('.seller-marker');
+        
+        sellerMarkers.forEach(function(marker) {
+            const lat = parseFloat(marker.dataset.lat);
+            const lng = parseFloat(marker.dataset.lng);
+            const name = marker.dataset.name;
+            const address = marker.dataset.address;
+            
+            if (lat && lng) {
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup('<strong>' + name + '</strong><br>' + address);
+            }
         });
     });
 </script>
+
+<!-- Hidden seller data for JavaScript -->
+{% for seller in sellers %}
+    {% if seller.latitude and seller.longitude %}
+        <div class="seller-marker" 
+             data-lat="{{ seller.latitude }}" 
+             data-lng="{{ seller.longitude }}"
+             data-name="{{ seller.business_name|default:seller.full_name|escapejs }}"
+             data-address="{{ seller.address|escapejs }}"
+             style="display: none;"></div>
+    {% endif %}
+{% endfor %}
 {% endblock %}
