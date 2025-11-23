@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load media_tags %}
 
 {% block title %}{{ product.name }} - Kaumahan Harvest Market{% endblock %}
 
@@ -8,7 +9,7 @@
     <div class="col-md-6 mb-3">
         <div class="card h-100">
             {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            <img src="{{ product.image|media_url }}" class="card-img-top" alt="{{ product.name }}">
         {% else %}
             <img src="{% static 'img/logo.png' %}" class="card-img-top" alt="{{ product.name }}">
         {% endif %}
