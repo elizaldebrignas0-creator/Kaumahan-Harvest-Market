@@ -1,4 +1,6 @@
-from django.urls import path
+from django.urls import path, re_path
+from django.conf import settings
+from django.views.static import serve
 
 from . import views
 
@@ -29,7 +31,12 @@ urlpatterns = [
 
     path("sellers/<int:user_id>/approve/", views.approve_seller, name="approve_seller"),
     path("sellers/<int:user_id>/reject/", views.reject_seller, name="reject_seller"),
-    
-    # Media serving for production
-    path("media/<path:path>", views.serve_media, name="serve_media"),
 ]
+
+# Serve media files in production
+if not settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]
