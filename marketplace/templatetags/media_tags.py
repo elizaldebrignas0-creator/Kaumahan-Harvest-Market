@@ -20,7 +20,14 @@ def media_url(image_field):
         try:
             import os
             from django.conf import settings
-            file_path = os.path.join(settings.MEDIA_ROOT, image_field.name)
+            
+            # Handle both media and static paths
+            if 'static/products/' in url:
+                # Static file path
+                file_path = os.path.join(settings.BASE_DIR, url.replace('/static/', ''))
+            else:
+                # Media file path
+                file_path = os.path.join(settings.MEDIA_ROOT, image_field.name)
             
             if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
                 return url
