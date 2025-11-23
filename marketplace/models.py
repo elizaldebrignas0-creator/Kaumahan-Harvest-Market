@@ -130,7 +130,7 @@ class Product(models.Model):
         help_text='Select the unit of measurement for pricing'
     )
     
-    image = models.ImageField(upload_to="products/")
+    image = models.ImageField(upload_to="products/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)

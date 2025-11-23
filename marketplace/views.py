@@ -325,15 +325,6 @@ def seller_orders(request):
 def product_create(request):
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES)
-        
-        # Debug information
-        print(f"POST data: {request.POST}")
-        print(f"FILES data: {request.FILES}")
-        print(f"Form is valid: {form.is_valid()}")
-        
-        if not form.is_valid():
-            print(f"Form errors: {form.errors}")
-        
         if form.is_valid():
             product = form.save(commit=False)
             product.seller = request.user
