@@ -7,7 +7,7 @@
     <div class="col-md-6 mb-3">
         <div class="card h-100">
             {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" onerror="this.src='{% static 'img/logo.png' %}';">
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
         {% else %}
             <img src="{% static 'img/logo.png' %}" class="card-img-top" alt="{{ product.name }}">
         {% endif %}

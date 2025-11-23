@@ -56,7 +56,7 @@
             <div class="col-md-4 mb-4">
                 <div class="card card-product h-100">
                     {% if product.image %}
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}" onerror="this.src='{% static 'img/product-placeholder.jpg' %}';">
+                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                     {% else %}
                         <img src="{% static 'img/product-placeholder.jpg' %}" class="card-img-top" alt="{{ product.name }}">
                     {% endif %}
