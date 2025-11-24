@@ -31,9 +31,9 @@ class ImageHandler {
         // Handle dynamic content changes
         this.observeContentChanges();
         
-        // Add production-specific optimizations
+        // Only add production optimizations if there are issues
         if (this.isProduction) {
-            this.addProductionOptimizations();
+            setTimeout(() => this.addProductionOptimizations(), 1000);
         }
         
         // Setup periodic retry mechanism
@@ -67,6 +67,8 @@ class ImageHandler {
         // Production logging
         if (this.isProduction) {
             console.warn('Production - Image failed to load:', src);
+        } else {
+            console.warn('Development - Image failed to load:', src);
         }
         
         // Check if it's already using fallback
@@ -88,7 +90,8 @@ class ImageHandler {
             original: src,
             fallback: fallbackWithTimestamp,
             isMedia: src.includes('/media/'),
-            isStatic: src.includes('/static/')
+            isStatic: src.includes('/static/'),
+            isProductImage: src.includes('/media/products/')
         });
     }
 
@@ -150,11 +153,11 @@ class ImageHandler {
     }
 
     addProductionOptimizations() {
-        // Add cache-busting for media URLs in production
-        const images = document.querySelectorAll('img[src*="/media/"]');
-        images.forEach(img => {
+        // Only add cache-busting to images that have actually failed
+        const failedImages = document.querySelectorAll('.image-load-error[src*="/media/"]');
+        failedImages.forEach(img => {
             if (!img.src.includes('?t=') && !img.src.includes('?retry=')) {
-                // Add timestamp to prevent caching issues
+                console.log('Adding cache-busting to failed image:', img.src);
                 const separator = img.src.includes('?') ? '&' : '?';
                 img.src = img.src + separator + 't=' + Date.now();
             }
@@ -263,14 +266,58 @@ class ImageHandler {
         }
     }
     
-    // Method to force refresh all product images
-    refreshProductImages() {
+    // Method to test image loading
+    testImageLoading() {
+        console.log('=== IMAGE LOADING TEST ===');
         const productImages = document.querySelectorAll('img[src*="/media/products/"]');
-        console.log(`Refreshing ${productImages.length} product images`);
+        
+        console.log(`Found ${productImages.length} product images`);
+        
+        productImages.forEach((img, index) => {
+            console.log(`Image ${index + 1}:`, {
+                src: img.src,
+                complete: img.complete,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                classes: img.className,
+                hasError: img.classList.contains('image-load-error'),
+                isLoading: img.classList.contains('image-loading'),
+                isLoaded: img.classList.contains('image-loaded')
+            });
+            
+            // Test if image actually loads
+            if (!img.complete || img.naturalWidth === 0) {
+                console.warn(`Image ${index + 1} may not be loading properly:`, img.src);
+            }
+        });
+        
+        return {
+            total: productImages.length,
+            loaded: document.querySelectorAll('img.image-loaded[src*="/media/products/"]').length,
+            failed: document.querySelectorAll('img.image-load-error[src*="/media/products/"]').length,
+            loading: document.querySelectorAll('img.image-loading[src*="/media/products/"]').length
+        };
+    }
+    
+    // Method to force reload all product images
+    forceReloadProductImages() {
+        const productImages = document.querySelectorAll('img[src*="/media/products/"]');
+        console.log(`Force reloading ${productImages.length} product images`);
         
         productImages.forEach(img => {
             const originalSrc = img.src.split('?')[0];
-            img.src = originalSrc + '?refresh=' + Date.now();
+            const newSrc = originalSrc + '?force_reload=' + Date.now();
+            
+            // Remove error states
+            img.classList.remove('image-load-error', 'image-loaded');
+            img.classList.add('image-loading');
+            
+            // Clear from tracking sets
+            this.loadedImages.delete(img.src);
+            this.failedImages.delete(img.src);
+            
+            // Reload with new timestamp
+            img.src = newSrc;
         });
     }
 }
@@ -322,7 +369,8 @@ document.head.appendChild(styleSheet);
 window.imageStats = () => window.imageHandler.getImageStats();
 window.retryImages = () => window.imageHandler.retryFailedImages();
 window.validateMedia = () => window.imageHandler.validateMediaUrls();
-window.refreshImages = () => window.imageHandler.refreshProductImages();
+window.testImages = () => window.imageHandler.testImageLoading();
+window.reloadImages = () => window.imageHandler.forceReloadProductImages();
 
 // Auto-retry failed images after page load
 setTimeout(() => {
@@ -331,6 +379,12 @@ setTimeout(() => {
     // Validate media URLs in production
     if (window.imageHandler.isProduction) {
         window.imageHandler.validateMediaUrls();
+    }
+    
+    // Test image loading in development
+    if (!window.imageHandler.isProduction) {
+        console.log('Running image loading test in development...');
+        window.imageHandler.testImageLoading();
     }
 }, 2000);
 

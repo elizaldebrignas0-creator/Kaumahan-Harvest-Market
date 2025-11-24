@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load media_tags %}
+{% load product_images %}
 
 {% block title %}Buyer Dashboard - Kaumahan Harvest Market{% endblock %}
 
@@ -56,11 +57,7 @@
         {% for product in products %}
             <div class="col-md-4 mb-4">
                 <div class="card card-product h-100">
-                    {% if product.image and product.image.url %}
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
-                    {% else %}
-                        <img src="{% static 'img/product-placeholder.jpg' %}" class="card-img-top" alt="{{ product.name }}">
-                    {% endif %}
+                    {% product_image_tag product "card-img-top" product.name %}
                     <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="card-title mb-0">{{ product.name }}</h5>
