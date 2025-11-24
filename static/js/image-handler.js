@@ -31,13 +31,15 @@ class ImageHandler {
         // Handle dynamic content changes
         this.observeContentChanges();
         
-        // Only add production optimizations if there are issues
+        // Only add production optimizations in actual production
         if (this.isProduction) {
-            setTimeout(() => this.addProductionOptimizations(), 1000);
+            setTimeout(() => this.addProductionOptimizations(), 2000);
         }
         
-        // Setup periodic retry mechanism
-        this.setupPeriodicRetry();
+        // Setup periodic retry mechanism only in production
+        if (this.isProduction) {
+            this.setupPeriodicRetry();
+        }
     }
 
     handleImageError(event) {
@@ -108,23 +110,27 @@ class ImageHandler {
     processExistingImages() {
         const images = document.querySelectorAll('img');
         images.forEach(img => {
-            // Validate that product images don't accidentally show logo
-            if (img.src.includes('/media/products/') && img.src.includes('logo')) {
-                console.warn('Logo detected in media products, replacing with placeholder:', img.src);
-                img.src = this.fallbackUrl + '?t=' + Date.now();
-                img.classList.add('img-fallback');
-                return;
-            }
-            
-            if (!img.complete) {
-                // Add loading state
-                img.classList.add('image-loading');
-            } else if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-                // Handle broken images that are already "complete"
-                this.handleFailedImage(img);
+            // In development, only handle obviously broken images
+            if (!this.isProduction) {
+                if (!img.complete) {
+                    // Add loading state for images still loading
+                    img.classList.add('image-loading');
+                } else if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                    // Only handle truly broken images
+                    this.handleFailedImage(img);
+                } else {
+                    // Successfully loaded
+                    this.handleSuccessfulImage(img);
+                }
             } else {
-                // Handle successfully loaded images
-                this.handleSuccessfulImage(img);
+                // In production, be more careful with validation
+                if (!img.complete) {
+                    img.classList.add('image-loading');
+                } else if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                    this.handleFailedImage(img);
+                } else {
+                    this.handleSuccessfulImage(img);
+                }
             }
         });
     }
@@ -153,28 +159,27 @@ class ImageHandler {
     }
 
     addProductionOptimizations() {
-        // Only add cache-busting to images that have actually failed
-        const failedImages = document.querySelectorAll('.image-load-error[src*="/media/"]');
-        failedImages.forEach(img => {
+        // Only add cache-busting to images that have actually failed and are media files
+        const failedMediaImages = document.querySelectorAll('.image-load-error[src*="/media/products/"]');
+        failedMediaImages.forEach(img => {
             if (!img.src.includes('?t=') && !img.src.includes('?retry=')) {
-                console.log('Adding cache-busting to failed image:', img.src);
+                console.log('Adding cache-busting to failed media image:', img.src);
                 const separator = img.src.includes('?') ? '&' : '?';
                 img.src = img.src + separator + 't=' + Date.now();
             }
         });
         
-        // Validate that no media images are showing logo
+        // Only validate for actual logo issues, don't interfere with normal images
         this.validateMediaImages();
     }
     
     validateMediaImages() {
-        const mediaImages = document.querySelectorAll('img[src*="/media/"]');
-        mediaImages.forEach(img => {
-            if (img.src.includes('logo') || img.src.includes('banner') || img.src.includes('favicon')) {
-                console.warn('Invalid media image detected:', img.src);
-                img.src = this.fallbackUrl + '?t=' + Date.now();
-                img.classList.add('img-fallback');
-            }
+        // Only check for actual logo files in media directory, don't interfere with product images
+        const problematicImages = document.querySelectorAll('img[src*="/media/"][src*="logo"], img[src*="/media/"][src*="banner"], img[src*="/media/"][src*="favicon"]');
+        problematicImages.forEach(img => {
+            console.warn('Invalid media image detected (logo/banner in media):', img.src);
+            img.src = this.fallbackUrl + '?t=' + Date.now();
+            img.classList.add('img-fallback');
         });
     }
 
@@ -372,23 +377,15 @@ window.validateMedia = () => window.imageHandler.validateMediaUrls();
 window.testImages = () => window.imageHandler.testImageLoading();
 window.reloadImages = () => window.imageHandler.forceReloadProductImages();
 
-// Auto-retry failed images after page load
+// Auto-retry failed images after page load (only in production)
 setTimeout(() => {
-    window.imageHandler.retryFailedImages();
-    
-    // Validate media URLs in production
     if (window.imageHandler.isProduction) {
+        window.imageHandler.retryFailedImages();
         window.imageHandler.validateMediaUrls();
-    }
-    
-    // Test image loading in development
-    if (!window.imageHandler.isProduction) {
-        console.log('Running image loading test in development...');
-        window.imageHandler.testImageLoading();
     }
 }, 2000);
 
-// Periodic validation in production (every 30 seconds)
+// Periodic validation only in production (every 30 seconds)
 if (window.imageHandler.isProduction) {
     setInterval(() => {
         window.imageHandler.validateMediaImages();
