@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load media_tags %}
 
 {% block extra_css %}
 <style>
@@ -323,7 +324,7 @@
 
                                     <div class="text-center mt-3">
                                         <img id="imagePreview"
-                                             src="{% if form.instance.image %}{{ form.instance.image|media_url }}{% else %}{% static 'img/product-placeholder.jpg' %}{% endif %}"
+                                             src="{% if form.instance.image and form.instance.image.url %}{{ form.instance.image.url }}{% else %}{% static 'img/product-placeholder.jpg' %}{% endif %}"
                                              alt="Product preview"
                                              class="img-fluid image-preview {% if form.instance.image %}d-block{% endif %}"
                                              style="max-height: 200px; width: auto; object-fit: contain;">
