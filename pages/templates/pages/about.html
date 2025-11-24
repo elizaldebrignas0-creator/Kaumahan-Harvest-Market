@@ -350,20 +350,6 @@
             font-size: 0.9rem !important;
             padding: 0.75rem 0 !important;
         }
-        
-        /* Responsive video play button */
-        .video-play-button {
-            width: 60px !important;
-            height: 60px !important;
-        }
-        
-        .video-play-button i {
-            font-size: 1.5rem !important;
-        }
-        
-        .video-play-text {
-            font-size: 1rem !important;
-        }
     }
     
     @media (max-width: 576px) {
@@ -424,20 +410,6 @@
         .about-text {
             font-size: 0.95rem !important;
         }
-        
-        /* Extra small video play button */
-        .video-play-button {
-            width: 50px !important;
-            height: 50px !important;
-        }
-        
-        .video-play-button i {
-            font-size: 1.2rem !important;
-        }
-        
-        .video-play-text {
-            font-size: 0.9rem !important;
-        }
     }
     
     /* Animation classes */
@@ -453,6 +425,34 @@
     .delay-1 { animation-delay: 0.3s; }
     .delay-2 { animation-delay: 0.6s; }
     .delay-3 { animation-delay: 0.9s; }
+    
+    /* Video Play Button Styles */
+    .video-play-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 8px;
+        transition: background 0.3s ease;
+    }
+    
+    .video-play-overlay:hover {
+        background: rgba(0, 0, 0, 0.6);
+    }
+    
+    .play-button {
+        transform: scale(1);
+        transition: transform 0.3s ease;
+    }
+    
+    .video-play-overlay:hover .play-button {
+        transform: scale(1.1);
+    }
 </style>
 {% endblock %}
 
@@ -487,17 +487,15 @@
             
             <!-- Slide 3: Video -->
             <div class="banner-slide">
-                <div class="video-container" id="videoContainer">
-                    <video id="aboutVideo" playsinline preload="metadata">
+                <div class="video-container" onclick="toggleVideo()" style="cursor: pointer;">
+                    <video id="advertisementVideo" preload="metadata" playsinline>
                         <source src="{% static 'img/advertisement.mp4' %}" type="video/mp4">
                         Your browser does not support the video tag.
                     </video>
-                    <!-- Custom Play Button Overlay -->
-                    <div class="video-play-overlay" id="videoPlayOverlay">
-                        <div class="video-play-button">
-                            <i class="fas fa-play"></i>
+                    <div id="videoPlayButton" class="video-play-overlay">
+                        <div class="play-button">
+                            <i class="bi bi-play-circle-fill" style="font-size: 4rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></i>
                         </div>
-                        <p class="video-play-text">Click to play</p>
                     </div>
                 </div>
                 <div class="banner-overlay" style="background: rgba(0, 0, 0, 0.3);">
@@ -546,165 +544,136 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Video functionality
-    const videoContainer = document.getElementById('videoContainer');
-    const video = document.getElementById('aboutVideo');
-    const playOverlay = document.getElementById('videoPlayOverlay');
-    const playButton = document.querySelector('.video-play-button');
-    
-    if (video && playOverlay) {
-        // Handle play button click
-        const playVideo = function() {
-            video.play();
-            videoContainer.classList.add('video-playing');
-            playOverlay.style.display = 'none';
-        };
+    document.addEventListener('DOMContentLoaded', function() {
+        const carousel = document.querySelector('.banner-carousel');
+        const slidesContainer = document.querySelector('.banner-slides');
+        const slides = document.querySelectorAll('.banner-slide');
+        const prevBtn = document.querySelector('.carousel-prev');
+        const nextBtn = document.querySelector('.carousel-next');
+        const indicators = document.querySelectorAll('.carousel-indicator');
         
-        // Add click event to play button
-        playButton.addEventListener('click', playVideo);
-        playOverlay.addEventListener('click', playVideo);
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        let slideInterval;
         
-        // Show overlay when video ends
-        video.addEventListener('ended', function() {
-            videoContainer.classList.remove('video-playing');
-            playOverlay.style.display = 'flex';
-        });
-        
-        // Handle video pause (optional - show overlay when paused)
-        video.addEventListener('pause', function() {
-            if (!video.ended) {
-                videoContainer.classList.remove('video-playing');
-                playOverlay.style.display = 'flex';
-            }
-        });
-        
-        // Handle video play (hide overlay)
-        video.addEventListener('play', function() {
-            videoContainer.classList.add('video-playing');
-            playOverlay.style.display = 'none';
-        });
-    }
-    
-    // Carousel functionality
-    const carousel = document.querySelector('.banner-carousel');
-    const slidesContainer = document.querySelector('.banner-slides');
-    const slides = document.querySelectorAll('.banner-slide');
-    const prevBtn = document.querySelector('.carousel-prev');
-    const nextBtn = document.querySelector('.carousel-next');
-    const indicators = document.querySelectorAll('.carousel-indicator');
-    
-    let currentSlide = 0;
-    const totalSlides = slides.length;
-    let slideInterval;
-    
-    // Set initial slide position
-    function updateSlidePosition() {
-        slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-        updateIndicators();
-        
-        // Pause video when leaving video slide
-        if (video && currentSlide !== 2) {
-            video.pause();
-            video.currentTime = 0;
-            videoContainer.classList.remove('video-playing');
-            playOverlay.style.display = 'flex';
+        // Set initial slide position
+        function updateSlidePosition() {
+            slidesContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+            updateIndicators();
         }
-    }
-    
-    // Update active indicator
-    function updateIndicators() {
-        indicators.forEach((indicator, index) => {
-            indicator.classList.toggle('active', index === currentSlide);
-        });
-    }
-    
-    // Go to specific slide
-    function goToSlide(index) {
-        if (index < 0) {
-            currentSlide = totalSlides - 1;
-        } else if (index >= totalSlides) {
-            currentSlide = 0;
-        } else {
-            currentSlide = index;
-        }
-        updateSlidePosition();
-    }
-    
-    // Next slide
-    function nextSlide() {
-        goToSlide(currentSlide + 1);
-        resetInterval();
-    }
-    
-    // Previous slide
-    function prevSlide() {
-        goToSlide(currentSlide - 1);
-        resetInterval();
-    }
-    
-    // Auto slide
-    function startInterval() {
-        stopInterval();
-        slideInterval = setInterval(nextSlide, 5000);
-    }
-    
-    function stopInterval() {
-        clearInterval(slideInterval);
-    }
-    
-    function resetInterval() {
-        stopInterval();
-        startInterval();
-    }
-    
-    // Event Listeners
-    prevBtn.addEventListener('click', prevSlide);
-    nextBtn.addEventListener('click', nextSlide);
-    
-    // Indicator click
-    indicators.forEach((indicator, index) => {
-        indicator.addEventListener('click', () => {
-            goToSlide(index);
-            resetInterval();
-        });
-    });
-    
-    // Pause on hover
-    carousel.addEventListener('mouseenter', stopInterval);
-    carousel.addEventListener('mouseleave', startInterval);
-    
-    // Touch events for mobile
-    let touchStartX = 0;
-    let touchEndX = 0;
-    
-    carousel.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-        stopInterval();
-    }, { passive: true });
-    
-    carousel.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].clientX;
-        handleSwipe();
-        resetInterval();
-    }, { passive: true });
-    
-    function handleSwipe() {
-        const swipeThreshold = 50;
-        const difference = touchStartX - touchEndX;
         
-        if (Math.abs(difference) > swipeThreshold) {
-            if (difference > 0) {
-                nextSlide();
+        // Update active indicator
+        function updateIndicators() {
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === currentSlide);
+            });
+        }
+        
+        // Go to specific slide
+        function goToSlide(index) {
+            if (index < 0) {
+                currentSlide = totalSlides - 1;
+            } else if (index >= totalSlides) {
+                currentSlide = 0;
             } else {
-                prevSlide();
+                currentSlide = index;
+            }
+            updateSlidePosition();
+        }
+        
+        // Next slide
+        function nextSlide() {
+            goToSlide(currentSlide + 1);
+            resetInterval();
+        }
+        
+        // Previous slide
+        function prevSlide() {
+            goToSlide(currentSlide - 1);
+            resetInterval();
+        }
+        
+        // Auto slide
+        function startInterval() {
+            stopInterval();
+            slideInterval = setInterval(nextSlide, 5000);
+        }
+        
+        function stopInterval() {
+            clearInterval(slideInterval);
+        }
+        
+        function resetInterval() {
+            stopInterval();
+            startInterval();
+        }
+        
+        // Event Listeners
+        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', nextSlide);
+        
+        // Indicator click
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                goToSlide(index);
+                resetInterval();
+            });
+        });
+        
+        // Pause on hover
+        carousel.addEventListener('mouseenter', stopInterval);
+        carousel.addEventListener('mouseleave', startInterval);
+        
+        // Touch events for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        carousel.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            stopInterval();
+        }, { passive: true });
+        
+        carousel.addEventListener('touchend', (e) => {
+            touchEndX = e.changedTouches[0].clientX;
+            handleSwipe();
+            resetInterval();
+        }, { passive: true });
+        
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const difference = touchStartX - touchEndX;
+            
+            if (Math.abs(difference) > swipeThreshold) {
+                if (difference > 0) {
+                    nextSlide();
+                } else {
+                    prevSlide();
+                }
             }
         }
-    }
-    
-    // Initialize
-    updateSlidePosition();
-    startInterval();
-});
+        
+        // Video control functions
+        function toggleVideo() {
+            const video = document.getElementById('advertisementVideo');
+            const playButton = document.getElementById('videoPlayButton');
+            
+            if (video.paused) {
+                video.play();
+                playButton.style.display = 'none';
+            } else {
+                video.pause();
+                playButton.style.display = 'flex';
+            }
+        }
+        
+        // Handle video end
+        document.getElementById('advertisementVideo').addEventListener('ended', function() {
+            document.getElementById('videoPlayButton').style.display = 'flex';
+        });
+        
+        // Initialize
+        updateSlidePosition();
+        startInterval();
+    });
 </script>
 {% endblock %}

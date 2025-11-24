@@ -9,7 +9,7 @@
     <div class="col-md-6 mb-3">
         <div class="card h-100">
             {% if product.image %}
-            <img src="{{ product.image|media_url }}" class="card-img-top" alt="{{ product.name }}">
+            <img src="{% if product.image and product.image.url %}{{ product.image.url }}{% else %}{% static 'img/product-placeholder.jpg' %}{% endif %}" class="card-img-top" alt="{{ product.name }}">
         {% else %}
             <img src="{% static 'img/logo.png' %}" class="card-img-top" alt="{{ product.name }}">
         {% endif %}
