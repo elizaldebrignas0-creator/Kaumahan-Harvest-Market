@@ -47,6 +47,7 @@
         height: auto;
         display: block;
         margin: 0 auto;
+        object-fit: contain;
     }
     
     .video-container {
@@ -64,6 +65,7 @@
         width: auto;
         height: auto;
         display: block;
+        object-fit: contain;
     }
     
     .banner-slide .logo-container {
@@ -310,8 +312,103 @@
             height: 300px;
         }
         
+        .banner-carousel {
+            margin: 1rem auto !important;
+            padding: 15px !important;
+        }
+        
+        .banner-slides {
+            height: 300px !important;
+        }
+        
+        .banner-title {
+            font-size: 2.5rem !important;
+        }
+        
+        .banner-subtitle {
+            font-size: 1.3rem !important;
+        }
+        
+        .carousel-control {
+            width: 45px !important;
+            height: 45px !important;
+        }
+        
+        .carousel-prev {
+            left: 15px !important;
+        }
+        
+        .carousel-next {
+            right: 15px !important;
+        }
+        
         .about-logo {
             max-width: 180px;
+        }
+        
+        .contact-bar {
+            font-size: 0.9rem !important;
+            padding: 0.75rem 0 !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .banner-carousel {
+            margin: 0.5rem auto !important;
+            padding: 10px !important;
+        }
+        
+        .banner-slides {
+            height: 250px !important;
+        }
+        
+        .banner-title {
+            font-size: 2rem !important;
+        }
+        
+        .banner-subtitle {
+            font-size: 1.1rem !important;
+        }
+        
+        .carousel-control {
+            width: 40px !important;
+            height: 40px !important;
+        }
+        
+        .carousel-prev {
+            left: 10px !important;
+        }
+        
+        .carousel-next {
+            right: 10px !important;
+        }
+        
+        .carousel-control i {
+            font-size: 1.2rem !important;
+        }
+        
+        .carousel-indicators {
+            bottom: 15px !important;
+            padding: 6px 12px !important;
+            gap: 8px !important;
+        }
+        
+        .carousel-indicator {
+            width: 8px !important;
+            height: 8px !important;
+        }
+        
+        .carousel-indicator.active {
+            width: 20px !important;
+        }
+        
+        .contact-bar {
+            font-size: 0.8rem !important;
+            padding: 0.5rem 0 !important;
+        }
+        
+        .about-text {
+            font-size: 0.95rem !important;
         }
     }
     
