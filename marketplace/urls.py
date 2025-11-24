@@ -3,6 +3,7 @@ from django.conf import settings
 from django.views.static import serve
 
 from . import views
+from . import admin_views
 
 
 urlpatterns = [
@@ -14,6 +15,10 @@ urlpatterns = [
     path("buyer/", views.buyer_dashboard, name="buyer_dashboard"),
     path("seller/", views.seller_dashboard, name="seller_dashboard"),
     path("admin-panel/", views.admin_dashboard, name="admin_dashboard"),
+
+    # Admin dashboard URLs
+    path("admin-dashboard/", admin_views.admin_dashboard, name="enhanced_admin_dashboard"),
+    path("admin/chart-data/", admin_views.admin_chart_data, name="admin_chart_data"),
 
     path("cart/", views.cart_view, name="cart"),
     path("cart/add/<int:product_id>/", views.add_to_cart, name="add_to_cart"),
