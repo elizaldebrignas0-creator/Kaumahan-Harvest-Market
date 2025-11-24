@@ -1,6 +1,5 @@
 from django import template
 from django.templatetags.static import static
-from django.conf import settings
 
 register = template.Library()
 
@@ -15,19 +14,7 @@ def media_url(image_field):
     
     # Check if image field has a valid URL
     if hasattr(image_field, 'url') and image_field.url:
-        try:
-            # Verify the file exists in production
-            if not settings.DEBUG:
-                import os
-                media_path = os.path.join(settings.MEDIA_ROOT, str(image_field))
-                if os.path.exists(media_path):
-                    return image_field.url
-                else:
-                    return static('img/product-placeholder.jpg')
-            else:
-                return image_field.url
-        except (AttributeError, ValueError):
-            return static('img/product-placeholder.jpg')
+        return image_field.url
     
     return static('img/product-placeholder.jpg')
 

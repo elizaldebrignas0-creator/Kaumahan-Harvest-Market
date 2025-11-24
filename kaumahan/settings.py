@@ -120,12 +120,6 @@ STATICFILES_FINDERS = [
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Ensure media directories exist
-import os
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-os.makedirs(os.path.join(MEDIA_ROOT, 'products'), exist_ok=True)
-os.makedirs(os.path.join(MEDIA_ROOT, 'business_permits'), exist_ok=True)
-
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
