@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Loading Test - Kaumahan Harvest Market</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/styles.css">
+    <link rel="stylesheet" href="static/css/responsive.css">
+    <style>
+        .test-image {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 8px;
+            margin: 10px 0;
+            background: #f8f9fa;
+        }
+        .test-image img {
+            max-width: 200px;
+            max-height: 150px;
+        }
+        .status-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 123, 255, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            z-index: 1000;
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            border: 2px dashed #007bff;
+            border-radius: 8px;
+        }
+        .image-info {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator">Loading...</div>
+    
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="#">Kaumahan Image Test</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <h1 class="text-center mb-4">Image Loading Consistency Test</h1>
+            
+            <!-- Static Images Test -->
+            <div class="test-section">
+                <h2>Static Images</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="static/img/logo.png" alt="Logo" class="img-fluid">
+                            <div class="image-info">Logo (static/img/logo.png)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="static/img/banner.png" alt="Banner" class="img-fluid">
+                            <div class="image-info">Banner (static/img/banner.png)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="static/img/product-placeholder.jpg" alt="Product Placeholder" class="img-fluid">
+                            <div class="image-info">Product Placeholder (static/img/product-placeholder.jpg)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="static/img/favicon.png" alt="Favicon" class="img-fluid">
+                            <div class="image-info">Favicon (static/img/favicon.png)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Images Test -->
+            <div class="test-section">
+                <h2>Media Images</h2>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="media/products/placeholder.jpg" alt="Media Placeholder" class="img-fluid">
+                            <div class="image-info">Media Placeholder (media/products/placeholder.jpg)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="media/products/nonexistent.jpg" alt="Non-existent" class="img-fluid">
+                            <div class="image-info">Non-existent (should show fallback)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="media/invalid/path.jpg" alt="Invalid Path" class="img-fluid">
+                            <div class="image-info">Invalid Path (should show fallback)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="test-image">
+                            <img src="http://invalid-domain/image.jpg" alt="Invalid Domain" class="img-fluid">
+                            <div class="image-info">Invalid Domain (should show fallback)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Loading Test -->
+            <div class="test-section">
+                <h2>Dynamic Loading Test</h2>
+                <button class="btn btn-primary mb-3" onclick="loadDynamicImages()">Load Dynamic Images</button>
+                <div id="dynamicImages" class="row">
+                    <!-- Dynamic images will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Reload Test -->
+            <div class="test-section">
+                <h2>Reload Persistence Test</h2>
+                <p>Refresh this page to test image persistence</p>
+                <button class="btn btn-success mb-3" onclick="location.reload()">Reload Page</button>
+                <div class="test-image">
+                    <img src="static/img/logo.png" alt="Reload Test" class="img-fluid" id="reloadTest">
+                    <div class="image-info">This image should persist after reload</div>
+                </div>
+            </div>
+
+            <!-- Error Handling Test -->
+            <div class="test-section">
+                <h2>Error Handling Test</h2>
+                <p>These images should automatically show fallbacks:</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="test-image">
+                            <img src="static/img/nonexistent.jpg" alt="Non-existent Static" class="img-fluid">
+                            <div class="image-info">Non-existent Static Image</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="test-image">
+                            <img src="media/products/fake.jpg" alt="Non-existent Media" class="img-fluid">
+                            <div class="image-info">Non-existent Media Image</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="test-image">
+                            <img src="broken-url" alt="Broken URL" class="img-fluid">
+                            <div class="image-info">Completely Broken URL</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="test-section">
+                <h2>Image Loading Statistics</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Loaded Images</h5>
+                                <p class="card-text display-4" id="loadedCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Failed Images</h5>
+                                <p class="card-text display-4" id="failedCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Total Images</h5>
+                                <p class="card-text display-4" id="totalCount">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-info mt-3" onclick="updateStats()">Update Statistics</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="static/js/image-handler.js"></script>
+    
+    <script>
+        function updateStatus() {
+            const stats = window.imageHandler.getImageStats();
+            document.getElementById('statusIndicator').textContent = 
+                `Loaded: ${stats.loaded} | Failed: ${stats.failed} | Total: ${stats.total}`;
+            
+            document.getElementById('loadedCount').textContent = stats.loaded;
+            document.getElementById('failedCount').textContent = stats.failed;
+            document.getElementById('totalCount').textContent = stats.total;
+        }
+
+        function loadDynamicImages() {
+            const container = document.getElementById('dynamicImages');
+            container.innerHTML = '';
+            
+            const testImages = [
+                'static/img/logo.png',
+                'static/img/banner.png',
+                'media/products/placeholder.jpg',
+                'static/img/nonexistent.jpg',
+                'media/products/fake.jpg'
+            ];
+            
+            testImages.forEach((src, index) => {
+                const col = document.createElement('div');
+                col.className = 'col-md-3';
+                col.innerHTML = `
+                    <div class="test-image">
+                        <img src="${src}" alt="Dynamic ${index + 1}" class="img-fluid">
+                        <div class="image-info">Dynamic ${index + 1}: ${src}</div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+            
+            // Update stats after loading
+            setTimeout(updateStats, 1000);
+        }
+
+        function updateStats() {
+            updateStatus();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatus();
+            
+            // Update stats every 2 seconds
+            setInterval(updateStatus, 2000);
+            
+            // Log initial state
+            console.log('Image Handler initialized:', window.imageHandler.getImageStats());
+        });
+
+        // Test reload persistence
+        window.addEventListener('load', function() {
+            const reloadTest = document.getElementById('reloadTest');
+            if (reloadTest.complete && reloadTest.naturalWidth > 0) {
+                console.log('Reload test image loaded successfully');
+            } else {
+                console.warn('Reload test image failed to load');
+            }
+        });
+    </script>
+</body>
+</html>

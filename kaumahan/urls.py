@@ -2,6 +2,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
+from django.views.static import serve
+from django.urls import re_path
 
 
 urlpatterns = [
@@ -11,13 +13,13 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
 ]
 
-# Serve media files in both development and production
+# Enhanced media file serving for both development and production
 if settings.DEBUG:
+    # Development: Django serves media files
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 else:
-    # In production, we need to explicitly include media serving
-    from django.views.static import serve
-    from django.urls import re_path
+    # Production: Serve media files with proper caching headers
     urlpatterns += [
         re_path(r'^media/(?P<path>.*)$', serve, {
             'document_root': settings.MEDIA_ROOT,
