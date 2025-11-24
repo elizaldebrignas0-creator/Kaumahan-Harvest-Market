@@ -25,3 +25,6 @@ else:
             'document_root': settings.MEDIA_ROOT,
         }),
     ]
+    
+    # Ensure static files are served in production
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -20,6 +20,10 @@ services:
         value: "/media/"
       - key: STATIC_URL
         value: "/static/"
+      - key: MEDIA_ROOT
+        value: "/opt/render/project/src/media"
+      - key: USE_S3
+        value: False
 
 databases:
   - name: kaumahan-harvest-db

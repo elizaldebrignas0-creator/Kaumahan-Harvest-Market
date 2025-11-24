@@ -1,6 +1,6 @@
 /**
- * Image Loading Handler for Kaumahan Harvest Market
- * Ensures consistent image loading and provides fallbacks
+ * Enhanced Image Loading Handler for Kaumahan Harvest Market
+ * Ensures consistent image loading and provides fallbacks in production
  */
 
 class ImageHandler {
@@ -10,6 +10,7 @@ class ImageHandler {
         this.failedImages = new Set();
         this.retryAttempts = new Map();
         this.maxRetries = 3;
+        this.isProduction = !window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1');
         this.init();
     }
 
@@ -30,8 +31,10 @@ class ImageHandler {
         // Handle dynamic content changes
         this.observeContentChanges();
         
-        // Add cache-busting for problematic images
-        this.addCacheBusting();
+        // Add production-specific optimizations
+        if (this.isProduction) {
+            this.addProductionOptimizations();
+        }
         
         // Setup periodic retry mechanism
         this.setupPeriodicRetry();
@@ -60,7 +63,11 @@ class ImageHandler {
         }
 
         this.failedImages.add(src);
-        console.warn('Image failed to load:', src);
+        
+        // Production logging
+        if (this.isProduction) {
+            console.warn('Production - Image failed to load:', src);
+        }
         
         // Check if it's already using fallback
         if (src.includes('product-placeholder.jpg')) {
@@ -126,14 +133,14 @@ class ImageHandler {
         });
     }
 
-    addCacheBusting() {
-        // Add cache-busting to media URLs that might be cached
+    addProductionOptimizations() {
+        // Add cache-busting for media URLs in production
         const images = document.querySelectorAll('img[src*="/media/"]');
         images.forEach(img => {
             if (!img.src.includes('?t=')) {
-                const originalSrc = img.src;
-                img.onload = () => this.handleSuccessfulImage(img);
-                img.onerror = () => this.handleFailedImage(img);
+                // Add timestamp to prevent caching issues
+                const separator = img.src.includes('?') ? '&' : '?';
+                img.src = img.src + separator + 't=' + Date.now();
             }
         });
     }
@@ -146,7 +153,6 @@ class ImageHandler {
                 const attempts = this.retryAttempts.get(img.src) || 0;
                 if (attempts < this.maxRetries) {
                     this.retryAttempts.set(img.src, attempts + 1);
-                    console.log(`Retrying image (${attempts + 1}/${this.maxRetries}):`, img.src);
                     
                     // Force reload with cache busting
                     const originalSrc = img.src.split('?')[0];
@@ -183,7 +189,8 @@ class ImageHandler {
         return {
             loaded: this.loadedImages.size,
             failed: this.failedImages.size,
-            total: document.querySelectorAll('img').length
+            total: document.querySelectorAll('img').length,
+            isProduction: this.isProduction
         };
     }
 
@@ -193,8 +200,22 @@ class ImageHandler {
         failedImages.forEach(img => {
             const originalSrc = img.src.split('?')[0];
             if (!originalSrc.includes('product-placeholder.jpg')) {
-                console.log('Manual retry for:', originalSrc);
                 img.src = originalSrc + '?manual_retry=' + Date.now();
+            }
+        });
+    }
+
+    // Production-specific validation method
+    validateMediaUrls() {
+        if (!this.isProduction) return;
+        
+        const mediaImages = document.querySelectorAll('img[src*="/media/"]');
+        console.log(`Validating ${mediaImages.length} media images in production`);
+        
+        mediaImages.forEach(img => {
+            const url = new URL(img.src);
+            if (!url.pathname.startsWith('/media/')) {
+                console.warn('Invalid media URL detected:', img.src);
             }
         });
     }
@@ -226,24 +247,15 @@ const imageHandlerStyles = `
         background-color: #f8f9fa;
     }
     
-    /* Retry button for failed images */
-    .image-retry {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background: rgba(0, 123, 255, 0.8);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        cursor: pointer;
-        font-size: 12px;
-        display: none;
-    }
-    
-    .image-load-error:hover .image-retry {
-        display: block;
+    /* Production-specific styles */
+    .production-warning {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid #ffc107;
+        padding: 0.5rem;
+        border-radius: 4px;
+        margin: 0.5rem 0;
+        font-size: 0.875rem;
+        color: #856404;
     }
 `;
 
@@ -255,8 +267,14 @@ document.head.appendChild(styleSheet);
 // Make available globally for debugging
 window.imageStats = () => window.imageHandler.getImageStats();
 window.retryImages = () => window.imageHandler.retryFailedImages();
+window.validateMedia = () => window.imageHandler.validateMediaUrls();
 
 // Auto-retry failed images after page load
 setTimeout(() => {
     window.imageHandler.retryFailedImages();
+    
+    // Validate media URLs in production
+    if (window.imageHandler.isProduction) {
+        window.imageHandler.validateMediaUrls();
+    }
 }, 2000);
