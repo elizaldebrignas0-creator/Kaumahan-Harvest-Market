@@ -1,0 +1,32 @@
+/* Simple image consistency fixes */
+
+/* Ensure images load properly without interference */
+img[src*="/media/products/"] {
+    /* Allow natural loading without forced states */
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Only apply fallback styling when actually needed */
+.img-fallback {
+    opacity: 0.8;
+    border: 1px dashed #ddd;
+}
+
+/* Remove any loading states that might interfere */
+.image-loading {
+    /* No special styling - let images load naturally */
+}
+
+/* Ensure consistent image display across all pages */
+.card-img-top {
+    object-fit: cover;
+    width: 100%;
+    height: 200px;
+}
+
+/* Product image consistency */
+.product-image {
+    transition: none; /* Remove transitions that might cause flickering */
+}
