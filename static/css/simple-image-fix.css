@@ -14,11 +14,6 @@ img[src*="/media/products/"] {
     border: 1px dashed #ddd;
 }
 
-/* Remove any loading states that might interfere */
-.image-loading {
-    /* No special styling - let images load naturally */
-}
-
 /* Ensure consistent image display across all pages */
 .card-img-top {
     object-fit: cover;
