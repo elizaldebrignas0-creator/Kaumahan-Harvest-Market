@@ -75,13 +75,21 @@ class ImageHandler {
             return;
         }
 
-        // Apply fallback with cache busting
+        // IMPORTANT: Never use logo as fallback - always use product placeholder
         const fallbackWithTimestamp = this.fallbackUrl + '?t=' + Date.now();
         img.src = fallbackWithTimestamp;
         img.classList.add('img-fallback');
         
         // Add error handling class
         img.classList.add('image-load-error');
+        
+        // Log the original failed image for debugging
+        console.log('Image failed, using fallback:', {
+            original: src,
+            fallback: fallbackWithTimestamp,
+            isMedia: src.includes('/media/'),
+            isStatic: src.includes('/static/')
+        });
     }
 
     handleSuccessfulImage(img) {
@@ -97,10 +105,18 @@ class ImageHandler {
     processExistingImages() {
         const images = document.querySelectorAll('img');
         images.forEach(img => {
+            // Validate that product images don't accidentally show logo
+            if (img.src.includes('/media/products/') && img.src.includes('logo')) {
+                console.warn('Logo detected in media products, replacing with placeholder:', img.src);
+                img.src = this.fallbackUrl + '?t=' + Date.now();
+                img.classList.add('img-fallback');
+                return;
+            }
+            
             if (!img.complete) {
                 // Add loading state
                 img.classList.add('image-loading');
-            } else if (img.naturalWidth === 0) {
+            } else if (img.naturalWidth === 0 || img.naturalHeight === 0) {
                 // Handle broken images that are already "complete"
                 this.handleFailedImage(img);
             } else {
@@ -137,10 +153,24 @@ class ImageHandler {
         // Add cache-busting for media URLs in production
         const images = document.querySelectorAll('img[src*="/media/"]');
         images.forEach(img => {
-            if (!img.src.includes('?t=')) {
+            if (!img.src.includes('?t=') && !img.src.includes('?retry=')) {
                 // Add timestamp to prevent caching issues
                 const separator = img.src.includes('?') ? '&' : '?';
                 img.src = img.src + separator + 't=' + Date.now();
+            }
+        });
+        
+        // Validate that no media images are showing logo
+        this.validateMediaImages();
+    }
+    
+    validateMediaImages() {
+        const mediaImages = document.querySelectorAll('img[src*="/media/"]');
+        mediaImages.forEach(img => {
+            if (img.src.includes('logo') || img.src.includes('banner') || img.src.includes('favicon')) {
+                console.warn('Invalid media image detected:', img.src);
+                img.src = this.fallbackUrl + '?t=' + Date.now();
+                img.classList.add('img-fallback');
             }
         });
     }
@@ -212,11 +242,35 @@ class ImageHandler {
         const mediaImages = document.querySelectorAll('img[src*="/media/"]');
         console.log(`Validating ${mediaImages.length} media images in production`);
         
+        let issuesFound = 0;
         mediaImages.forEach(img => {
             const url = new URL(img.src);
             if (!url.pathname.startsWith('/media/')) {
                 console.warn('Invalid media URL detected:', img.src);
+                issuesFound++;
             }
+            
+            if (img.src.includes('logo') || img.src.includes('banner')) {
+                console.error('CRITICAL: Logo/banner found in media URLs:', img.src);
+                issuesFound++;
+            }
+        });
+        
+        if (issuesFound > 0) {
+            console.error(`Found ${issuesFound} media image issues in production`);
+        } else {
+            console.log('All media images validated successfully');
+        }
+    }
+    
+    // Method to force refresh all product images
+    refreshProductImages() {
+        const productImages = document.querySelectorAll('img[src*="/media/products/"]');
+        console.log(`Refreshing ${productImages.length} product images`);
+        
+        productImages.forEach(img => {
+            const originalSrc = img.src.split('?')[0];
+            img.src = originalSrc + '?refresh=' + Date.now();
         });
     }
 }
@@ -268,6 +322,7 @@ document.head.appendChild(styleSheet);
 window.imageStats = () => window.imageHandler.getImageStats();
 window.retryImages = () => window.imageHandler.retryFailedImages();
 window.validateMedia = () => window.imageHandler.validateMediaUrls();
+window.refreshImages = () => window.imageHandler.refreshProductImages();
 
 // Auto-retry failed images after page load
 setTimeout(() => {
@@ -278,3 +333,10 @@ setTimeout(() => {
         window.imageHandler.validateMediaUrls();
     }
 }, 2000);
+
+// Periodic validation in production (every 30 seconds)
+if (window.imageHandler.isProduction) {
+    setInterval(() => {
+        window.imageHandler.validateMediaImages();
+    }, 30000);
+}
