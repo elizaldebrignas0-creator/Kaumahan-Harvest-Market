@@ -461,34 +461,67 @@
             <div class="banner-slide">
                 <div class="video-container">
                     <div style="width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; position: relative;">
-                        <!-- Try video element first -->
+                        <!-- Primary video element with comprehensive attributes -->
                         <video 
                             id="advertisementVideo" 
                             controls
-                            preload="metadata" 
+                            preload="auto" 
                             playsinline
+                            muted
+                            loop
                             style="width: 100%; height: 100%; object-fit: contain; background: #000;"
                             poster="{% static 'img/banner.png' %}"
-                            onerror="this.style.display='none'; document.getElementById('videoFallback').style.display='flex';"
+                            onerror="handleVideoError(this)"
+                            onloadstart="console.log('Video load started')"
+                            onloadedmetadata="console.log('Video metadata loaded')"
+                            onloadeddata="console.log('Video data loaded')"
+                            oncanplay="console.log('Video can play')"
+                            oncanplaythrough="console.log('Video can play through')"
+                            onplay="console.log('Video playing')"
+                            onpause="console.log('Video paused')"
+                            onended="console.log('Video ended')"
                         >
                             <source src="{% static 'img/advertisement.mp4' %}" type="video/mp4">
+                            <source src="{% static 'img/advertisement.webm' %}" type="video/webm">
+                            <source src="{% static 'img/advertisement.ogg' %}" type="video/ogg">
                             Your browser does not support the video tag.
+                            <div style="padding: 20px; color: white; text-align: center;">
+                                <h3>Video Not Supported</h3>
+                                <p>Your browser doesn't support this video format.</p>
+                                <a href="{% static 'img/advertisement.mp4' %}" target="_blank" style="color: #4CAF50;">Watch Video</a>
+                            </div>
                         </video>
                         
-                        <!-- Fallback if video fails -->
-                        <div id="videoFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;">
-                            <h3 style="margin-bottom: 15px;">🎬 Advertisement Video</h3>
-                            <p style="margin-bottom: 20px;">Watch our promotional video to learn more about Kaumahan Harvest Market!</p>
-                            <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
-                                <a href="{% static 'img/advertisement.mp4' %}" target="_blank" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                                    📹 Watch Video
+                        <!-- Enhanced fallback interface -->
+                        <div id="videoFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px;">
+                            <div style="font-size: 3rem; margin-bottom: 15px;">🎬</div>
+                            <h3 style="margin-bottom: 15px; font-weight: 600;">Advertisement Video</h3>
+                            <p style="margin-bottom: 20px; opacity: 0.9;">Learn more about Kaumahan Harvest Market!</p>
+                            
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 15px;">
+                                <a href="{% static 'img/advertisement.mp4' %}" target="_blank" 
+                                   style="background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease;"
+                                   onmouseover="this.style.background='#218838'; this.style.transform='translateY(-2px)';"
+                                   onmouseout="this.style.background='#28a745'; this.style.transform='translateY(0)';">
+                                    <span>📹</span> Watch Video
                                 </a>
-                                <a href="{% static 'img/advertisement.mp4' %}" download style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                                    💾 Download
+                                <a href="{% static 'img/advertisement.mp4' %}" download 
+                                   style="background: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease;"
+                                   onmouseover="this.style.background='#0056b3'; this.style.transform='translateY(-2px)';"
+                                   onmouseout="this.style.background='#007bff'; this.style.transform='translateY(0)';">
+                                    <span>💾</span> Download
                                 </a>
                             </div>
-                            <p style="margin-top: 15px; font-size: 14px; opacity: 0.8;">
-                                If the video doesn't play in your browser, click the links above to watch or download.
+                            
+                            <button onclick="retryVideo()" 
+                                    style="background: #6c757d; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; transition: all 0.3s ease;"
+                                    onmouseover="this.style.background='#5a6268';"
+                                    onmouseout="this.style.background='#6c757d';">
+                                🔄 Retry Video
+                            </button>
+                            
+                            <p style="margin-top: 15px; font-size: 12px; opacity: 0.7;">
+                                If the video doesn't play, use the options above
                             </p>
                         </div>
                     </div>
@@ -651,46 +684,132 @@
         updateSlidePosition();
         startInterval();
         
-        // Video initialization and troubleshooting
+        // Video initialization and comprehensive error handling
         const video = document.getElementById('advertisementVideo');
         if (video) {
-            console.log('Video element found, initializing...');
+            console.log('🎬 Video element found, initializing comprehensive player...');
             
-            // Add event listeners for debugging
-            video.addEventListener('loadstart', () => console.log('Video loading started'));
-            video.addEventListener('loadedmetadata', () => console.log('Video metadata loaded'));
-            video.addEventListener('loadeddata', () => console.log('Video data loaded'));
-            video.addEventListener('canplay', () => console.log('Video can play'));
-            video.addEventListener('play', () => console.log('Video playing'));
-            video.addEventListener('pause', () => console.log('Video paused'));
-            video.addEventListener('error', (e) => {
-                console.error('Video error:', e);
-                console.error('Error code:', video.error ? video.error.code : 'Unknown');
-                console.log('Showing fallback interface...');
-                // Show fallback manually if onerror doesn't work
-                video.style.display = 'none';
-                const fallback = document.getElementById('videoFallback');
-                if (fallback) {
-                    fallback.style.display = 'flex';
-                }
+            // Add event listeners for debugging and error handling
+            video.addEventListener('loadstart', () => {
+                console.log('📹 Video loading started');
+                hideFallback();
             });
             
-            // Also check if video can be played after a timeout
+            video.addEventListener('loadedmetadata', () => {
+                console.log('📹 Video metadata loaded');
+                console.log(`📏 Dimensions: ${video.videoWidth}x${video.videoHeight}`);
+                console.log(`⏱️  Duration: ${video.duration} seconds`);
+            });
+            
+            video.addEventListener('loadeddata', () => {
+                console.log('📹 Video data loaded successfully');
+            });
+            
+            video.addEventListener('canplay', () => {
+                console.log('📹 Video can play - ready for user interaction');
+            });
+            
+            video.addEventListener('canplaythrough', () => {
+                console.log('📹 Video can play through - fully loaded');
+            });
+            
+            video.addEventListener('play', () => {
+                console.log('📹 Video playing');
+                // Pause carousel when video plays
+                stopInterval();
+            });
+            
+            video.addEventListener('pause', () => {
+                console.log('📹 Video paused');
+                // Resume carousel when video pauses
+                startInterval();
+            });
+            
+            video.addEventListener('ended', () => {
+                console.log('📹 Video ended');
+                // Resume carousel when video ends
+                startInterval();
+            });
+            
+            video.addEventListener('error', (e) => {
+                console.error('📹 Video error occurred:', e);
+                console.error('📹 Error code:', video.error ? video.error.code : 'Unknown');
+                console.error('📹 Error message:', video.error ? video.error.message : 'No message');
+                handleVideoError(video);
+            });
+            
+            video.addEventListener('stalled', () => {
+                console.warn('📹 Video stalled - network issue');
+            });
+            
+            video.addEventListener('waiting', () => {
+                console.log('📹 Video waiting for data');
+            });
+            
+            // Check video state after initialization
             setTimeout(() => {
                 if (video.readyState === 0) {
-                    console.log('Video not loaded after timeout, showing fallback...');
-                    video.style.display = 'none';
-                    const fallback = document.getElementById('videoFallback');
-                    if (fallback) {
-                        fallback.style.display = 'flex';
-                    }
+                    console.warn('📹 Video not loaded after 3 seconds - showing fallback');
+                    handleVideoError(video);
+                } else {
+                    console.log(`📹 Video ready state: ${video.readyState}`);
                 }
             }, 3000);
             
             // Try to load the video
-            video.load();
+            try {
+                video.load();
+                console.log('📹 Video load() called successfully');
+            } catch (error) {
+                console.error('📹 Error calling video.load():', error);
+                handleVideoError(video);
+            }
         } else {
-            console.error('Video element not found!');
+            console.error('📹 Video element not found!');
+        }
+        
+        // Global video error handler function
+        window.handleVideoError = function(videoElement) {
+            console.log('📹 Handling video error - showing fallback');
+            if (videoElement) {
+                videoElement.style.display = 'none';
+            }
+            const fallback = document.getElementById('videoFallback');
+            if (fallback) {
+                fallback.style.display = 'flex';
+            }
+        };
+        
+        // Global retry video function
+        window.retryVideo = function() {
+            console.log('📹 Retrying video playback...');
+            const video = document.getElementById('advertisementVideo');
+            const fallback = document.getElementById('videoFallback');
+            
+            if (video && fallback) {
+                // Hide fallback
+                fallback.style.display = 'none';
+                // Show video
+                video.style.display = 'block';
+                // Reload video
+                video.load();
+                // Try to play after a short delay
+                setTimeout(() => {
+                    video.play().catch(error => {
+                        console.error('📹 Auto-play failed:', error);
+                        // Show fallback again if auto-play fails
+                        handleVideoError(video);
+                    });
+                }, 1000);
+            }
+        };
+        
+        // Helper function to hide fallback
+        function hideFallback() {
+            const fallback = document.getElementById('videoFallback');
+            if (fallback) {
+                fallback.style.display = 'none';
+            }
         }
     });
 </script>
