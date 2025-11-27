@@ -22,8 +22,15 @@ services:
         value: "/static/"
       - key: MEDIA_ROOT
         value: "/opt/render/project/src/media"
+      - key: RENDER_PERSISTENT_DISK_PATH
+        value: "/opt/render/project/src/media"
       - key: USE_S3
         value: False
+    # Add persistent disk for media files
+    disks:
+      - name: media-disk
+        mountPath: /opt/render/project/src/media
+        sizeGB: 10
 
 databases:
   - name: kaumahan-harvest-db

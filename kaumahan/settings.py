@@ -118,7 +118,24 @@ STATICFILES_FINDERS = [
 
 # Media files configuration
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+
+# Development: Local media storage
+if DEBUG:
+    MEDIA_ROOT = BASE_DIR / "media"
+    DEFAULT_FILE_STORAGE = 'kaumahan.storage.RenderPersistentStorage'
+else:
+    # Production: Render Persistent Disk
+    # Render mounts persistent disk at /media
+    MEDIA_ROOT = os.environ.get('RENDER_PERSISTENT_DISK_PATH', '/media') 
+    DEFAULT_FILE_STORAGE = 'kaumahan.storage.RenderProductionStorage'
+
+# Ensure media directory exists
+import os
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+# Additional media settings
+MEDIA_UPLOAD_TO = "products/"  # Default upload path for products
 
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
