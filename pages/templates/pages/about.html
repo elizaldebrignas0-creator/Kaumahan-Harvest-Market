@@ -463,13 +463,15 @@
                     <video 
                         id="advertisementVideo" 
                         controls
-                        preload="metadata" 
+                        preload="auto" 
                         playsinline
-                        style="width: 100%; height: 100%; object-fit: contain;"
+                        muted
+                        style="width: 100%; height: 100%; object-fit: contain; background: #000;"
                         poster="{% static 'img/banner.png' %}"
                     >
                         <source src="{% static 'img/advertisement.mp4' %}" type="video/mp4">
                         Your browser does not support the video tag.
+                        <p>Video is not loading. <a href="{% static 'img/advertisement.mp4' %}" target="_blank">Click here to download and watch</a></p>
                     </video>
                 </div>
                 <div class="banner-overlay" style="background: rgba(0, 0, 0, 0.3);">
@@ -629,6 +631,29 @@
         // Initialize carousel
         updateSlidePosition();
         startInterval();
+        
+        // Video initialization and troubleshooting
+        const video = document.getElementById('advertisementVideo');
+        if (video) {
+            console.log('Video element found, initializing...');
+            
+            // Add event listeners for debugging
+            video.addEventListener('loadstart', () => console.log('Video loading started'));
+            video.addEventListener('loadedmetadata', () => console.log('Video metadata loaded'));
+            video.addEventListener('loadeddata', () => console.log('Video data loaded'));
+            video.addEventListener('canplay', () => console.log('Video can play'));
+            video.addEventListener('play', () => console.log('Video playing'));
+            video.addEventListener('pause', () => console.log('Video paused'));
+            video.addEventListener('error', (e) => {
+                console.error('Video error:', e);
+                console.error('Error code:', video.error ? video.error.code : 'Unknown');
+            });
+            
+            // Try to load the video
+            video.load();
+        } else {
+            console.error('Video element not found!');
+        }
     });
 </script>
 {% endblock %}
