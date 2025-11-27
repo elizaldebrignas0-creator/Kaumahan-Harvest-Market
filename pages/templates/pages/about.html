@@ -460,19 +460,38 @@
             <!-- Slide 3: Video -->
             <div class="banner-slide">
                 <div class="video-container">
-                    <video 
-                        id="advertisementVideo" 
-                        controls
-                        preload="auto" 
-                        playsinline
-                        muted
-                        style="width: 100%; height: 100%; object-fit: contain; background: #000;"
-                        poster="{% static 'img/banner.png' %}"
-                    >
-                        <source src="{% static 'img/advertisement.mp4' %}" type="video/mp4">
-                        Your browser does not support the video tag.
-                        <p>Video is not loading. <a href="{% static 'img/advertisement.mp4' %}" target="_blank">Click here to download and watch</a></p>
-                    </video>
+                    <div style="width: 100%; height: 100%; background: #000; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <!-- Try video element first -->
+                        <video 
+                            id="advertisementVideo" 
+                            controls
+                            preload="metadata" 
+                            playsinline
+                            style="width: 100%; height: 100%; object-fit: contain; background: #000;"
+                            poster="{% static 'img/banner.png' %}"
+                            onerror="this.style.display='none'; document.getElementById('videoFallback').style.display='flex';"
+                        >
+                            <source src="{% static 'img/advertisement.mp4' %}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        
+                        <!-- Fallback if video fails -->
+                        <div id="videoFallback" style="display: none; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; padding: 20px;">
+                            <h3 style="margin-bottom: 15px;">🎬 Advertisement Video</h3>
+                            <p style="margin-bottom: 20px;">Watch our promotional video to learn more about Kaumahan Harvest Market!</p>
+                            <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                                <a href="{% static 'img/advertisement.mp4' %}" target="_blank" style="background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                                    📹 Watch Video
+                                </a>
+                                <a href="{% static 'img/advertisement.mp4' %}" download style="background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                                    💾 Download
+                                </a>
+                            </div>
+                            <p style="margin-top: 15px; font-size: 14px; opacity: 0.8;">
+                                If the video doesn't play in your browser, click the links above to watch or download.
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 <div class="banner-overlay" style="background: rgba(0, 0, 0, 0.3);">
                     
@@ -647,7 +666,26 @@
             video.addEventListener('error', (e) => {
                 console.error('Video error:', e);
                 console.error('Error code:', video.error ? video.error.code : 'Unknown');
+                console.log('Showing fallback interface...');
+                // Show fallback manually if onerror doesn't work
+                video.style.display = 'none';
+                const fallback = document.getElementById('videoFallback');
+                if (fallback) {
+                    fallback.style.display = 'flex';
+                }
             });
+            
+            // Also check if video can be played after a timeout
+            setTimeout(() => {
+                if (video.readyState === 0) {
+                    console.log('Video not loaded after timeout, showing fallback...');
+                    video.style.display = 'none';
+                    const fallback = document.getElementById('videoFallback');
+                    if (fallback) {
+                        fallback.style.display = 'flex';
+                    }
+                }
+            }, 3000);
             
             // Try to load the video
             video.load();
