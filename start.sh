@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Running migrations..."
-python manage.py makemigrations --merge --settings=kaumahan.settings_build
+python manage.py makemigrations --merge --noinput --settings=kaumahan.settings_build
 python manage.py migrate --settings=kaumahan.settings_build
 echo "Making user admin..."
 python make_admin.py

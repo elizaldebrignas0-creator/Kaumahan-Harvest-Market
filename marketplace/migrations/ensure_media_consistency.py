@@ -37,7 +37,7 @@ def verify_product_images(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('marketplace', '0001_initial'),  # Replace with your latest migration
+        ('marketplace', '0008_alter_product_image'),  # Latest migration
     ]
 
     operations = [
