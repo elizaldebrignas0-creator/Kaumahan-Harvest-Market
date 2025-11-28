@@ -205,10 +205,10 @@ class RatingReviewAdmin(admin.ModelAdmin):
 
 
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ("user", "product", "quantity", "added_at")
-    list_filter = ("added_at", "user")
-    search_fields = ("user__email", "user__full_name", "product__name")
-    readonly_fields = ("added_at",)
+    list_display = ("buyer", "product", "quantity", "created_at")
+    list_filter = ("created_at", "buyer")
+    search_fields = ("buyer__email", "buyer__full_name", "product__name")
+    readonly_fields = ("created_at",)
     
     # Add custom actions
     actions = ['clear_cart_items']
