@@ -5,6 +5,9 @@ pip install -r requirements.txt
 python manage.py collectstatic --noinput
 python manage.py migrate
 
-echo "Build completed - S3 media storage configured"
-echo "Environment: ${DEBUG:-False}"
-echo "Storage backend: ${DEFAULT_FILE_STORAGE:-Default}"
+# Set up media directories for persistent storage
+python manage.py setup_media_directories
+
+echo "Build completed - media directories ready"
+echo "Media root: ${MEDIA_ROOT:-/opt/render/project/src/media}"
+ls -la ${MEDIA_ROOT:-/opt/render/project/src/media}/ || echo "Media directory not yet created"

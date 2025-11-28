@@ -2,7 +2,7 @@ services:
   - type: web
     name: kaumahan-harvest-market
     env: python
-    buildCommand: "./build.sh"
+    buildCommand: "./build_persistent.sh"
     startCommand: "gunicorn kaumahan.wsgi:application"
     staticPublishPath: staticfiles
     envVars:
@@ -22,10 +22,8 @@ services:
         value: "/static/"
       - key: MEDIA_ROOT
         value: "/opt/render/project/src/media"
-      - key: RENDER_PERSISTENT_DISK_PATH
-        value: "/opt/render/project/src/media"
-      - key: USE_S3
-        value: False
+      - key: DJANGO_SETTINGS_MODULE
+        value: "kaumahan.settings_persistent"
     # Add persistent disk for media files
     disks:
       - name: media-disk

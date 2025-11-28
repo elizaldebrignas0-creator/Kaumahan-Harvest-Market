@@ -1,6 +1,6 @@
 """
-Production Settings for Cloudinary Storage
-Use this settings file for Render Docker deployment
+Production Settings for Render Persistent Disk
+No third-party services required
 """
 
 from pathlib import Path
@@ -28,8 +28,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "storages",  # Required for Cloudinary storage
-    "cloudinary",
     "crispy_forms",
     "crispy_bootstrap5",
     "django_filters",
@@ -88,23 +86,16 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# CLOUDINARY CONFIGURATION
-CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET")
-CLOUDINARY_URL = config("CLOUDINARY_URL", default=None)
-
-# Cloudinary folder organization
-CLOUDINARY_FOLDER = "kaumahan_harvest_market"
-
-# MEDIA FILES (Cloudinary in Production)
+# MEDIA FILES (Render Persistent Disk)
 MEDIA_URL = "/media/"
-DEFAULT_FILE_STORAGE = 'storages.backends.cloudinary_storage.CloudinaryStorage'
+MEDIA_ROOT = config("MEDIA_ROOT", default="/opt/render/project/src/media")
 
-# Local fallback for development
-if DEBUG:
-    MEDIA_ROOT = BASE_DIR / "media"
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Ensure media directory exists
+if not os.path.exists(MEDIA_ROOT):
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+# Use default filesystem storage (persistent disk)
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # MODEL CONFIGURATION
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

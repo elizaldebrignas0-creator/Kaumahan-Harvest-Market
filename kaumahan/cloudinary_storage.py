@@ -1,104 +1,59 @@
 """
-Cloudinary storage backend for Django
-Easy setup for media file storage in production
+Cloudinary Storage Configuration for Django
+Easy setup with automatic optimization and transformations
 """
 
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-from django.core.files.storage import Storage
 from django.conf import settings
-from io import BytesIO
+from storages.backends.cloudinary_storage import CloudinaryStorage
 
 
-class CloudinaryStorage(Storage):
+class MediaCloudinaryStorage(CloudinaryStorage):
     """
-    Cloudinary storage backend for Django
+    Custom Cloudinary storage for media files
     """
-    
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        # Configure Cloudinary settings
         if not settings.DEBUG:
-            # Configure Cloudinary in production
-            cloudinary.config(
-                cloud_name=settings.CLOUDINARY_CLOUD_NAME,
-                api_key=settings.CLOUDINARY_API_KEY,
-                api_secret=settings.CLOUDINARY_API_SECRET
-            )
-    
-    def _save(self, name, content):
-        """
-        Save file to Cloudinary
-        """
-        if settings.DEBUG:
-            # Local development - save to filesystem
-            return super()._save(name, content)
-        
-        # Production - upload to Cloudinary
-        try:
-            # Read file content
-            content.seek(0)
-            file_content = content.read()
+            self.cloud_name = settings.CLOUDINARY_CLOUD_NAME
+            self.api_key = settings.CLOUDINARY_API_KEY
+            self.api_secret = settings.CLOUDINARY_API_SECRET
             
-            # Upload to Cloudinary
-            result = cloudinary.uploader.upload(
-                file_content,
-                public_id=name,
-                folder='media/products/',
-                resource_type='image',
-                format='jpg'
-            )
-            
-            # Return the public ID
-            return result['public_id']
-            
-        except Exception as e:
-            print(f"Cloudinary upload error: {e}")
-            raise
-    
+        super().__init__(*args, **kwargs)
+
     def url(self, name):
         """
-        Get URL for the file
+        Generate optimized Cloudinary URL
         """
-        if settings.DEBUG:
-            # Local development
+        if not settings.DEBUG:
+            # Production: Use Cloudinary URL with optimizations
+            base_url = super().url(name)
+            
+            # Add automatic optimizations for images
+            if name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+                # Auto-optimize: quality, format, and responsive
+                optimizations = 'q_auto,f_auto,w_auto,h_auto,c_scale'
+                return f"{base_url}?{optimizations}"
+            
+            return base_url
+        else:
+            # Development: Use local URL
             return f"{settings.MEDIA_URL}{name}"
-        
-        # Production - Cloudinary URL
-        try:
-            result = cloudinary.api.resource(name)
-            return result['secure_url']
-        except Exception:
-            # Fallback URL
-            return f"https://res.cloudinary.com/{settings.CLOUDINARY_CLOUD_NAME}/image/upload/{name}"
-    
-    def exists(self, name):
+
+    def get_valid_name(self, name):
         """
-        Check if file exists
+        Generate valid filename for Cloudinary
         """
-        if settings.DEBUG:
-            # Local development
-            import os
-            return os.path.exists(os.path.join(settings.MEDIA_ROOT, name))
-        
-        # Production - check Cloudinary
-        try:
-            cloudinary.api.resource(name)
-            return True
-        except Exception:
-            return False
-    
-    def delete(self, name):
-        """
-        Delete file from Cloudinary
-        """
-        if settings.DEBUG:
-            # Local development
-            import os
-            os.remove(os.path.join(settings.MEDIA_ROOT, name))
-            return
-        
-        # Production - delete from Cloudinary
-        try:
-            cloudinary.api.delete_resources([name])
-        except Exception as e:
-            print(f"Cloudinary delete error: {e}")
+        # Organize files in folders
+        if name.startswith('products/'):
+            return name  # Already organized
+        else:
+            return f"products/{name}"
+
+
+class StaticCloudinaryStorage(CloudinaryStorage):
+    """
+    Cloudinary storage for static files (optional)
+    """
+    def __init__(self, *args, **kwargs):
+        # Static files don't need optimizations
+        super().__init__(*args, **kwargs)

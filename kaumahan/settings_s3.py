@@ -1,6 +1,6 @@
 """
-Production Settings for Cloudinary Storage
-Use this settings file for Render Docker deployment
+Production Settings for AWS S3 Storage
+Use this settings file for Render deployment
 """
 
 from pathlib import Path
@@ -28,8 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "storages",  # Required for Cloudinary storage
-    "cloudinary",
+    "storages",  # Required for S3 storage
     "crispy_forms",
     "crispy_bootstrap5",
     "django_filters",
@@ -83,23 +82,24 @@ TIME_ZONE = "Asia/Manila"
 USE_I18N = True
 USE_TZ = True
 
-# STATIC FILES
+# STATIC FILES (Local + S3)
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# CLOUDINARY CONFIGURATION
-CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET")
-CLOUDINARY_URL = config("CLOUDINARY_URL", default=None)
+# AWS S3 CONFIGURATION
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="us-east-1")
+AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL", default=None)
+AWS_S3_SECURE_URLS = config("AWS_S3_SECURE_URLS", default=True, cast=bool)
+AWS_S3_FILE_OVERWRITE = config("AWS_S3_FILE_OVERWRITE", default=False, cast=bool)
+AWS_DEFAULT_ACL = config("AWS_DEFAULT_ACL", default="public-read")
 
-# Cloudinary folder organization
-CLOUDINARY_FOLDER = "kaumahan_harvest_market"
-
-# MEDIA FILES (Cloudinary in Production)
+# MEDIA FILES (S3 in Production)
 MEDIA_URL = "/media/"
-DEFAULT_FILE_STORAGE = 'storages.backends.cloudinary_storage.CloudinaryStorage'
+DEFAULT_FILE_STORAGE = 'kaumahan.s3_storage.MediaStorage'
 
 # Local fallback for development
 if DEBUG:

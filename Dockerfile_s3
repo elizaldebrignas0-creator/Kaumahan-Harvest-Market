@@ -1,0 +1,40 @@
+# Use Python 3.11 slim image
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DJANGO_SETTINGS_MODULE=kaumahan.settings_s3
+
+# Set work directory
+WORKDIR /opt/render/project/src
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        postgresql-client \
+        build-essential \
+        libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+COPY requirements_s3.txt /opt/render/project/src/
+RUN pip install --no-cache-dir -r requirements_s3.txt
+
+# Copy project
+COPY . /opt/render/project/src/
+
+# Create media directory (for development fallback)
+RUN mkdir -p /opt/render/project/src/media
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
+
+# Run migrations
+RUN python manage.py migrate
+
+# Expose port
+EXPOSE 8000
+
+# Run the application
+CMD ["gunicorn", "kaumahan.wsgi:application", "--bind", "0.0.0.0:8000"]

@@ -1,0 +1,35 @@
+# RENDER ENVIRONMENT VARIABLES FOR AWS S3 STORAGE
+# Copy and paste these into your Render dashboard
+
+# === DATABASE ===
+DATABASE_URL=postgresql://username:password@host:port/dbname
+
+# === DJANGO SETTINGS ===
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=your-app.onrender.com,*.onrender.com
+
+# === AWS S3 CONFIGURATION ===
+AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+AWS_STORAGE_BUCKET_NAME=kaumahan-media-bucket
+AWS_S3_REGION_NAME=us-east-1
+AWS_S3_SECURE_URLS=True
+AWS_S3_FILE_OVERWRITE=False
+AWS_DEFAULT_ACL=public-read
+
+# === MEDIA CONFIGURATION ===
+MEDIA_URL=/media/
+DEFAULT_FILE_STORAGE=kaumahan.s3_storage.MediaStorage
+
+# === STATIC CONFIGURATION ===
+STATIC_URL=/static/
+STATICFILES_DIRS=/opt/render/project/src/static
+
+# === SECURITY ===
+SECURE_SSL_REDIRECT=True
+CSRF_COOKIE_SECURE=True
+SESSION_COOKIE_SECURE=True
+
+# === EMAIL ===
+DEFAULT_FROM_EMAIL=admin@kaumahan.onrender.com

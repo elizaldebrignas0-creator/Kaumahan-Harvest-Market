@@ -1,0 +1,32 @@
+# RENDER ENVIRONMENT VARIABLES FOR CLOUDINARY STORAGE
+# Copy and paste these into your Render dashboard
+
+# === DATABASE ===
+DATABASE_URL=postgresql://username:password@host:port/dbname
+
+# === DJANGO SETTINGS ===
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=your-app.onrender.com,*.onrender.com
+
+# === CLOUDINARY CONFIGURATION ===
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=123456789012345
+CLOUDINARY_API_SECRET=your-api-secret-here
+CLOUDINARY_URL=cloudinary://123456789012345:your-api-secret@your-cloud-name
+
+# === MEDIA CONFIGURATION ===
+MEDIA_URL=/media/
+DEFAULT_FILE_STORAGE=kaumahan.cloudinary_storage.MediaCloudinaryStorage
+
+# === STATIC CONFIGURATION ===
+STATIC_URL=/static/
+STATICFILES_DIRS=/opt/render/project/src/static
+
+# === SECURITY ===
+SECURE_SSL_REDIRECT=True
+CSRF_COOKIE_SECURE=True
+SESSION_COOKIE_SECURE=True
+
+# === EMAIL ===
+DEFAULT_FROM_EMAIL=admin@kaumahan.onrender.com
