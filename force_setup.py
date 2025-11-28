@@ -14,14 +14,14 @@ if 'debug_toolbar' in django.conf.settings.INSTALLED_APPS:
 django.setup()
 
 from django.db import connection
-from marketplace.models import CustomUser, Product, Category, Order, OrderItem, RatingReview, CartItem
+from marketplace.models import CustomUser, Product, CartItem, Order, OrderItem, RatingReview
 
 def create_tables_manually():
     """Create database tables manually if they don't exist"""
     
     # Get all model classes
     models = [
-        CustomUser, Product, Category, Order, OrderItem, RatingReview, CartItem,
+        CustomUser, Product, CartItem, Order, OrderItem, RatingReview,
         # Add Django built-in models
         django.contrib.auth.models.Permission,
         django.contrib.auth.models.Group,
