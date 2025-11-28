@@ -2,7 +2,7 @@
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kaumahan.production_settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kaumahan.settings_build')
 django.setup()
 
 from marketplace.models import CustomUser

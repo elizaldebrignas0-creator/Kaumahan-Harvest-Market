@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Running migrations..."
-python manage.py migrate --settings=kaumahan.settings_cloudinary
+python manage.py migrate --settings=kaumahan.settings_build
 echo "Making user admin..."
 python make_admin.py
 echo "Admin script completed"

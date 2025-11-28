@@ -13,11 +13,11 @@ SECRET_KEY = 'django-insecure-build-key-for-docker-only'
 DEBUG = False
 ALLOWED_HOSTS = ['*']
 
-# DATABASE - SQLite fallback for build
+# DATABASE - SQLite in /tmp directory (always writable)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': '/tmp/db.sqlite3',
     }
 }
 
