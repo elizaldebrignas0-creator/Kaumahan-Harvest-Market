@@ -55,40 +55,40 @@
                 {% endfor %}
             </div>
             
-            <div class="seller-only-container mb-4" style="display:none;">
-                <div class="card border-success">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">
-                            <i class="fas fa-store me-2"></i>
-                            Seller Information
-                        </h5>
+            <div class="seller-only-container" style="display:none;">
+                <div class="seller-section-header">
+                    <h4 class="h5 mb-3">
+                        <i class="fas fa-store me-2"></i>Seller Information
+                    </h4>
+                    <p class="text-muted small mb-4">Provide your business details and location</p>
+                </div>
+                
+                <div class="seller-info-card">
+                    <div class="auth-field mb-3">
+                        <label class="form-label fw-bold" for="id_business_name">Business name</label>
+                        <input type="text" name="business_name" class="form-control" id="id_business_name" value="{{ form.business_name.value|default:'' }}">
+                        {% for error in form.business_name.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
                     </div>
-                    <div class="card-body">
-                        <div class="seller-only auth-field mb-3">
-                            <label class="form-label fw-bold" for="id_business_name">Business name</label>
-                            <input type="text" name="business_name" class="form-control" id="id_business_name" value="{{ form.business_name.value|default:'' }}">
-                            {% for error in form.business_name.errors %}
-                                <div class="text-danger small mt-1">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                        
-                        <div class="seller-only auth-field mb-3">
-                            <label class="form-label fw-bold" for="id_business_permit">Business permit (image/PDF)</label>
-                            <input type="file" name="business_permit" class="form-control" id="id_business_permit">
-                            {% for error in form.business_permit.errors %}
-                                <div class="text-danger small mt-1">{{ error }}</div>
-                            {% endfor %}
-                            <div class="form-text text-muted">Upload your business permit as an image or PDF file</div>
-                        </div>
-                        
-                        <div class="seller-only auth-field mb-3" id="seller-map-wrapper">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-map-marker-alt me-2"></i>
-                                Pin your business location
-                            </label>
-                            <div id="seller-map" class="map-container border rounded" style="height: 250px;"></div>
-                            <div class="form-text text-muted mt-1">Click on the map to set your exact location in Biliran. This helps buyers find your business.</div>
-                        </div>
+                    
+                    <div class="auth-field mb-3">
+                        <label class="form-label fw-bold" for="id_business_permit">Business permit (image/PDF)</label>
+                        <input type="file" name="business_permit" class="form-control" id="id_business_permit">
+                        <div class="form-text text-muted mt-1">Upload your business permit or license (JPG, PNG, PDF)</div>
+                        {% for error in form.business_permit.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="seller-map-card mt-3">
+                    <div class="auth-field mb-3">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-map-marker-alt me-2"></i>Pin your business location
+                        </label>
+                        <div id="seller-map" class="map-container border rounded" style="height: 200px;"></div>
+                        <div class="form-text text-muted mt-1">Click on the map to set your exact location in Biliran.</div>
                     </div>
                 </div>
             </div>
@@ -119,7 +119,8 @@
                     {% endfor %}
                 </div>
             {% endif %}
-
+            
+            
             <div class="auth-section">
                 <button type="submit" class="btn btn-primary w-100">Create account</button>
             </div>
