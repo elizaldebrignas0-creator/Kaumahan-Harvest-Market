@@ -14,8 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chmod +x start.sh
 
-# Use production settings for build (has fallbacks)
-RUN python manage.py collectstatic --noinput --settings=kaumahan.production_settings
+# Use build settings for Docker build (no external dependencies)
+RUN python manage.py collectstatic --noinput --settings=kaumahan.settings_build
 
 EXPOSE 8000
 
