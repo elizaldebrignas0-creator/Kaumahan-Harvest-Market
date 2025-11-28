@@ -89,10 +89,10 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # CLOUDINARY CONFIGURATION
-CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME")
-CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY")
-CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET")
-CLOUDINARY_URL = config("CLOUDINARY_URL", default=None)
+CLOUDINARY_CLOUD_NAME = config("CLOUDINARY_CLOUD_NAME", default="temp-cloud-name")
+CLOUDINARY_API_KEY = config("CLOUDINARY_API_KEY", default="123456789012345")
+CLOUDINARY_API_SECRET = config("CLOUDINARY_API_SECRET", default="temp-api-secret")
+CLOUDINARY_URL = config("CLOUDINARY_URL", default="cloudinary://123456789012345:temp-api-secret@temp-cloud-name")
 
 # Cloudinary folder organization
 CLOUDINARY_FOLDER = "kaumahan_harvest_market"

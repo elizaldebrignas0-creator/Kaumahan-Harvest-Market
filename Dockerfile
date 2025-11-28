@@ -14,8 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN chmod +x start.sh
 
-# Use Cloudinary settings for production
-RUN python manage.py collectstatic --noinput --settings=kaumahan.settings_cloudinary
+# Use production settings for build (has fallbacks)
+RUN python manage.py collectstatic --noinput --settings=kaumahan.production_settings
 
 EXPOSE 8000
 
