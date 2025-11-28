@@ -55,20 +55,42 @@
                 {% endfor %}
             </div>
             
-            <div class="seller-only auth-field mb-3" style="display:none;">
-                <label class="form-label fw-bold" for="id_business_name">Business name</label>
-                <input type="text" name="business_name" class="form-control" id="id_business_name" value="{{ form.business_name.value|default:'' }}">
-                {% for error in form.business_name.errors %}
-                    <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
-            </div>
-            
-            <div class="seller-only auth-field mb-3" style="display:none;">
-                <label class="form-label fw-bold" for="id_business_permit">Business permit (image/PDF)</label>
-                <input type="file" name="business_permit" class="form-control" id="id_business_permit">
-                {% for error in form.business_permit.errors %}
-                    <div class="text-danger small mt-1">{{ error }}</div>
-                {% endfor %}
+            <div class="seller-only-container mb-4" style="display:none;">
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-store me-2"></i>
+                            Seller Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="seller-only auth-field mb-3">
+                            <label class="form-label fw-bold" for="id_business_name">Business name</label>
+                            <input type="text" name="business_name" class="form-control" id="id_business_name" value="{{ form.business_name.value|default:'' }}">
+                            {% for error in form.business_name.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="seller-only auth-field mb-3">
+                            <label class="form-label fw-bold" for="id_business_permit">Business permit (image/PDF)</label>
+                            <input type="file" name="business_permit" class="form-control" id="id_business_permit">
+                            {% for error in form.business_permit.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text text-muted">Upload your business permit as an image or PDF file</div>
+                        </div>
+                        
+                        <div class="seller-only auth-field mb-3" id="seller-map-wrapper">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                Pin your business location
+                            </label>
+                            <div id="seller-map" class="map-container border rounded" style="height: 250px;"></div>
+                            <div class="form-text text-muted mt-1">Click on the map to set your exact location in Biliran. This helps buyers find your business.</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="auth-field mb-3">
@@ -97,12 +119,6 @@
                     {% endfor %}
                 </div>
             {% endif %}
-            
-            <div class="seller-only auth-field mb-3" id="seller-map-wrapper" style="display:none;">
-                <label class="form-label fw-bold">Pin your business location</label>
-                <div id="seller-map" class="map-container border rounded" style="height: 200px;"></div>
-                <div class="form-text text-muted mt-1">Click on the map to set your exact location in Biliran.</div>
-            </div>
 
             <div class="auth-section">
                 <button type="submit" class="btn btn-primary w-100">Create account</button>
@@ -123,16 +139,16 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const userTypeSelect = document.getElementById('id_user_type');
-        const sellerOnlyFields = document.querySelectorAll('.seller-only');
+        const sellerContainer = document.querySelector('.seller-only-container');
         const latInput = document.getElementById('id_latitude');
         const lngInput = document.getElementById('id_longitude');
         let map, marker;
 
         function toggleSellerFields() {
             const isSeller = userTypeSelect && userTypeSelect.value === 'seller';
-            sellerOnlyFields.forEach(function (el) {
-                el.style.display = isSeller ? '' : 'none';
-            });
+            if (sellerContainer) {
+                sellerContainer.style.display = isSeller ? '' : 'none';
+            }
             if (isSeller && !map && typeof L !== 'undefined') {
                 map = L.map('seller-map').setView([11.5833, 124.4667], 11);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
