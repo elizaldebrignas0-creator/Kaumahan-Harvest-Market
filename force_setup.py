@@ -3,8 +3,8 @@ import os
 import sys
 import django
 
-# Set up Django without debug toolbar
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kaumahan.settings_build')
+# Set up Django with PRODUCTION settings for PostgreSQL
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'kaumahan.production_settings')
 
 # Remove debug toolbar from installed apps temporarily
 import django.conf
